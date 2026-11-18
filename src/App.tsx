@@ -24,8 +24,8 @@ import type { Transaction, TransactionType } from './types';
 const MainAppContent: React.FC = () => {
   const { isLoading, settings, refreshData } = useFinancial();
 
-  // Splash opening animation state
-  const [showSplash, setShowSplash] = useState(true);
+  // Splash opening animation state (Default false for instant load without splash video delay)
+  const [showSplash, setShowSplash] = useState(false);
 
   // Navigation tab
   const [currentTab, setCurrentTab] = useState<TabType>('home');

@@ -65,36 +65,40 @@ jobs:
       - name: Build Signed Android Release APK
         run: |
           cd android
-          ./gradlew assembleRelease --no-daemon
+          ./gradlew assembleRelease --no-daemon -PversionCode=${{ github.run_number }} -PversionName="1.0.${{ github.run_number }}"
 
       - name: Prepare Release APK Artifact
         run: |
           mkdir -p release-apk
-          cp android/app/build/outputs/apk/release/app-release.apk release-apk/MONETRA-v3.0.0-release.apk
+          APK_NAME="MONETRA-${{ startsWith(github.ref, 'refs/tags/') && github.ref_name || format('v1.0.{0}', github.run_number) }}-release.apk"
+          cp android/app/build/outputs/apk/release/app-release.apk "release-apk/${APK_NAME}"
+          cp android/app/build/outputs/apk/release/app-release.apk release-apk/MONETRA-latest-release.apk
 
       - name: Upload Build Artifact to GitHub Actions
         uses: actions/upload-artifact@v4
         with:
-          name: MONETRA-v3.0.0-release-apk
-          path: release-apk/MONETRA-v3.0.0-release.apk
+          name: MONETRA-release-apk-b${{ github.run_number }}
+          path: release-apk/*.apk
 
       - name: Create or Update GitHub Release
         uses: softprops/action-gh-release@v2
         if: startsWith(github.ref, 'refs/tags/') || github.ref == 'refs/heads/main'
         with:
-          tag_name: ${{ github.ref_name == 'main' && 'latest' || github.ref_name }}
-          name: ${{ github.ref_name == 'main' && 'MONETRA V3 Latest Release' || github.ref_name }}
+          tag_name: ${{ startsWith(github.ref, 'refs/tags/') && github.ref_name || format('v1.0.{0}', github.run_number) }}
+          name: ${{ startsWith(github.ref, 'refs/tags/') && format('MONETRA V3 Tagged Release {0}', github.ref_name) || format('MONETRA V3 Build #{0}', github.run_number) }}
           body: |
-            ## 🚀 MONETRA V3 - Institutional Personal Finance (Automated CI Build)
+            ## 🚀 MONETRA V3 - Institutional Personal Finance (Build #${{ github.run_number }})
             
             This release was automatically built, tested, signed, and published by GitHub Actions.
             
-            ### 📱 Installation
-            Download `MONETRA-v3.0.0-release.apk` below and install it directly on your Android device.
+            ### 📱 Package & Compatibility Info
+            - **Application ID**: `io.monetra.app`
+            - **Build Number (versionCode)**: `${{ github.run_number }}`
+            - **Version Name**: `1.0.${{ github.run_number }}`
+            - **Signing Signature**: Consistent key signature (supports 1-click update over existing app).
             
-            - **Paise Precision Engine**: 100% loss-free integer math.
-            - **Local-First & Offline**: Complete privacy on-device.
-            - **Multi-Theme Support**: Monochrome Neon Lime theme default.
-          files: release-apk/MONETRA-v3.0.0-release.apk
+            ### 📥 Download & Install
+            Download `MONETRA-latest-release.apk` below and install or update directly on your Android device.
+          files: release-apk/*.apk
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

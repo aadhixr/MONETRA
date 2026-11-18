@@ -44,7 +44,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
   const upToDate = isCurrentMonth(currentMonth) ? undefined : getMonthEndDate(currentMonth);
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 lg:gap-6 pb-24 md:pb-12">
+    <div className="w-full max-w-5xl mx-auto overflow-x-hidden grid grid-cols-1 lg:grid-cols-12 gap-5 lg:gap-6 pb-28 md:pb-12">
       {/* Primary Column: Hero Balance, Quick Actions, and Monthly Overview */}
       <div className="lg:col-span-7 space-y-4 sm:space-y-5">
         {/* 1. Main Balance Hero Card (Available Spending Only - No Savings, No Net Worth) */}

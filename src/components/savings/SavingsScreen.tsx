@@ -1,6 +1,5 @@
-// MONETRA V3 - Primary Screen 3: Savings Goals & Dedicated Savings Ledger
 import React, { useState, useMemo } from 'react';
-import { Plus, PiggyBank, Target, CheckCircle2, Trash2, ArrowDownLeft, ArrowUpRight, History, Landmark, ShieldCheck, Layers } from 'lucide-react';
+import { Plus, PiggyBank, Target, CheckCircle2, Trash2, ArrowDownLeft, ArrowUpRight, History, Landmark, ShieldCheck, Layers, Edit2 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { Card } from '../common/Card';
 import { Button } from '../common/Button';
@@ -26,6 +25,8 @@ export const SavingsScreen: React.FC = () => {
     contributeToSavings,
     withdrawFromSavings,
     deleteSavingsGoal,
+    updateAccount,
+    addAccount,
   } = useFinancial();
 
   // Modal states
@@ -33,6 +34,11 @@ export const SavingsScreen: React.FC = () => {
   const [selectedGoal, setSelectedGoal] = useState<SavingsGoal | null>(null);
   const [showContributeModal, setShowContributeModal] = useState(false);
   const [showWithdrawModal, setShowWithdrawModal] = useState(false);
+
+  // Pre-Savings / Starting Savings Balance Modal State
+  const [showSetPreSavingsModal, setShowSetPreSavingsModal] = useState(false);
+  const [preSavingsAmountStr, setPreSavingsAmountStr] = useState('');
+  const [preSavingsError, setPreSavingsError] = useState<string | null>(null);
 
   // Direct Transfer / Deposit to Savings (No Goal Required)
   const [showDirectTransferModal, setShowDirectTransferModal] = useState(false);
@@ -423,6 +429,50 @@ export const SavingsScreen: React.FC = () => {
     }
   };
 
+  const handleOpenSetPreSavings = () => {
+    const savingsAcc = savingsAccounts[0] || accounts.find((a) => a.type === 'savings');
+    setPreSavingsAmountStr(savingsAcc ? (savingsAcc.opening_balance_paise / 100).toString() : '0');
+    setPreSavingsError(null);
+    setShowSetPreSavingsModal(true);
+  };
+
+  const handleSetPreSavingsBalance = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setPreSavingsError(null);
+    const newInitialPaise = toPaise(preSavingsAmountStr);
+    if (newInitialPaise < 0) {
+      setPreSavingsError('Starting balance cannot be negative.');
+      return;
+    }
+
+    try {
+      let savingsAcc = savingsAccounts[0] || accounts.find((a) => a.type === 'savings');
+      if (savingsAcc) {
+        await updateAccount(savingsAcc.id, { opening_balance_paise: newInitialPaise });
+      } else {
+        await addAccount({
+          name: 'Savings Reserve',
+          type: 'savings',
+          opening_balance_paise: newInitialPaise,
+          current_balance_paise: newInitialPaise,
+          currency: 'INR',
+          is_archived: false,
+        });
+      }
+
+      confetti({
+        particleCount: 60,
+        spread: 50,
+        origin: { y: 0.6 },
+        colors: ['#A8E66A', '#E7FF32'],
+      });
+
+      setShowSetPreSavingsModal(false);
+    } catch (err: any) {
+      setPreSavingsError(err.message || 'Failed to update pre-savings balance.');
+    }
+  };
+
   // Quick preset goals
   const PRESET_GOALS = [
     'Emergency Fund',
@@ -443,9 +493,14 @@ export const SavingsScreen: React.FC = () => {
             <span className="text-xs uppercase font-extrabold text-[#A8E66A] tracking-wider">
               Total Savings Balance
             </span>
-            <span className="text-[10px] text-[#A1A69A] bg-[#23281F] px-2 py-0.5 rounded-full border border-[#30352B]">
-              Isolated Reserve
-            </span>
+            <button
+              onClick={handleOpenSetPreSavings}
+              className="p-1 px-2 rounded-lg bg-[#23281F] border border-[#30352B] text-[#A8E66A] hover:text-white hover:border-[#A8E66A] transition-colors flex items-center space-x-1"
+              title="Set Starting Pre-Savings Balance"
+            >
+              <Edit2 className="w-3 h-3" />
+              <span className="text-[10px] font-bold">Set Starting</span>
+            </button>
           </div>
           <button
             onClick={handleOpenCreateGoal}
@@ -1249,6 +1304,46 @@ export const SavingsScreen: React.FC = () => {
         requiredPaise={insufficientInfo.requiredPaise}
         actionType={insufficientInfo.actionType}
       />
+
+      {/* Set Pre-Savings / Starting Balance Modal */}
+      <Modal
+        isOpen={showSetPreSavingsModal}
+        onClose={() => setShowSetPreSavingsModal(false)}
+        title="Set Starting Savings Balance"
+        subtitle="Set the initial savings amount you currently have so MONETRA starts tracking from it."
+      >
+        <form onSubmit={handleSetPreSavingsBalance} className="space-y-4">
+          <div>
+            <label className="block text-xs font-medium text-[#A1A69A] mb-1.5">
+              Starting Savings Balance (₹) *
+            </label>
+            <input
+              type="number"
+              step="any"
+              required
+              autoFocus
+              value={preSavingsAmountStr}
+              onChange={(e) => setPreSavingsAmountStr(e.target.value)}
+              placeholder="e.g. 50000"
+              className="w-full bg-[#1C2019] border border-[#30352B] rounded-xl px-4 py-3 text-xl font-black text-[#A8E66A] focus:outline-none focus:border-[#A8E66A]"
+            />
+          </div>
+
+          <p className="text-xs text-[#A1A69A]">
+            This sets the baseline savings balance in your dedicated Savings Reserve account without affecting your daily spending balance.
+          </p>
+
+          {preSavingsError && (
+            <div className="p-3 bg-[#FF6868]/15 border border-[#FF6868]/40 rounded-xl text-xs text-[#FF6868]">
+              {preSavingsError}
+            </div>
+          )}
+
+          <Button type="submit" variant="primary" fullWidth size="lg">
+            Save Starting Balance
+          </Button>
+        </form>
+      </Modal>
     </div>
   );
 };
