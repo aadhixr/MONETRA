@@ -23,7 +23,10 @@ export const BottomNav: React.FC<BottomNavProps> = ({
   ];
 
   return (
-    <div className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-[#0E110C]/95 backdrop-blur-md border-t border-[#30352B] pb-safe">
+    <div
+      className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-[#0E110C]/95 backdrop-blur-md border-t border-[#30352B]"
+      style={{ paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 0.5rem)' }}
+    >
       <div className="max-w-md mx-auto px-4 py-2 flex items-center justify-between relative">
         {/* Left two tabs: HOME, BUDGET */}
         <div className="flex items-center space-x-6">

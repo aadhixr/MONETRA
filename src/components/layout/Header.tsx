@@ -113,7 +113,10 @@ export const Header: React.FC<HeaderProps> = ({
   ];
 
   return (
-    <header className="px-4 sm:px-6 lg:px-8 pt-3 sm:pt-4 pb-2.5 bg-[#090B08]/95 backdrop-blur-md sticky top-0 z-30 border-b border-[#30352B]/50 transition-all">
+    <header
+      className="px-4 sm:px-6 lg:px-8 pb-2.5 bg-[#090B08]/95 backdrop-blur-md sticky top-0 z-30 border-b border-[#30352B]/50 transition-all"
+      style={{ paddingTop: 'calc(env(safe-area-inset-top, 0px) + 0.75rem)' }}
+    >
       <div className="w-full max-w-7xl mx-auto flex items-center justify-between gap-3 sm:gap-4">
         {/* Left: Brand Identity & User Profile */}
         <div className="flex items-center space-x-3 shrink-0">
