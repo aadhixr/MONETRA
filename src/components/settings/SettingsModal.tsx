@@ -138,9 +138,31 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
     e.target.value = '';
   };
 
-  const CURRENT_APP_VERSION = 'v1.0.5';
-  const CURRENT_BUILD_NUMBER = '105';
+  const CURRENT_APP_VERSION = 'v1.0.24';
+  const CURRENT_BUILD_NUMBER = '124';
   const LAST_UPDATE_DATE = '19 Nov 2026';
+
+  const parseSemVer = (tag: string): number[] => {
+    return tag
+      .trim()
+      .toLowerCase()
+      .replace(/^v/, '')
+      .split('.')
+      .map((p) => parseInt(p, 10) || 0);
+  };
+
+  const isNewerVersion = (remoteTag: string, localTag: string): boolean => {
+    const r = parseSemVer(remoteTag);
+    const l = parseSemVer(localTag);
+    const len = Math.max(r.length, l.length);
+    for (let i = 0; i < len; i++) {
+      const rPart = r[i] ?? 0;
+      const lPart = l[i] ?? 0;
+      if (rPart > lPart) return true;
+      if (rPart < lPart) return false;
+    }
+    return false;
+  };
 
   const handleCheckForUpdates = async () => {
     setIsCheckingUpdate(true);
@@ -150,11 +172,11 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
         throw new Error('Could not connect to GitHub Release API');
       }
       const data = await res.json();
-      const latestTag = data.tag_name || 'v1.0.5';
+      const latestTag = data.tag_name || CURRENT_APP_VERSION;
       const apkAsset = data.assets?.find((a: any) => a.name.endsWith('.apk'));
       const downloadUrl = apkAsset?.browser_download_url || data.html_url;
 
-      if (latestTag !== CURRENT_APP_VERSION && latestTag > CURRENT_APP_VERSION) {
+      if (isNewerVersion(latestTag, CURRENT_APP_VERSION)) {
         setUpdateStatus({
           checked: true,
           hasUpdate: true,
@@ -167,7 +189,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
           checked: true,
           hasUpdate: false,
           latestTag,
-          message: `You are running the latest version of AURIX (${CURRENT_APP_VERSION}).`,
+          message: `You are running the latest version of AURIX PRO (${CURRENT_APP_VERSION}).`,
         });
       }
     } catch (err: any) {

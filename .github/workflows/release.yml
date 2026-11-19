@@ -72,13 +72,13 @@ jobs:
       - name: Prepare Release APK Artifact
         run: |
           mkdir -p release-apk
-          cp android/app/build/outputs/apk/release/app-release.apk release-apk/MONETRA-v1.0.${{ github.run_number }}-release.apk
-          cp android/app/build/outputs/apk/release/app-release.apk release-apk/MONETRA-latest-release.apk
+          cp android/app/build/outputs/apk/release/app-release.apk release-apk/AURIX-v1.0.${{ github.run_number }}-release.apk
+          cp android/app/build/outputs/apk/release/app-release.apk release-apk/AURIX-latest-release.apk
 
       - name: Upload Build Artifact to GitHub Actions
         uses: actions/upload-artifact@v4
         with:
-          name: MONETRA-release-apk-b${{ github.run_number }}
+          name: AURIX-release-apk-b${{ github.run_number }}
           path: release-apk/*.apk
 
       - name: Create or Update GitHub Release
@@ -86,19 +86,19 @@ jobs:
         if: startsWith(github.ref, 'refs/tags/') || github.ref == 'refs/heads/main'
         with:
           tag_name: v1.0.${{ github.run_number }}
-          name: MONETRA V3 Build #${{ github.run_number }}
+          name: AURIX PRO Build #${{ github.run_number }}
           body: |
-            ## 🚀 MONETRA V3 - Institutional Personal Finance
+            ## 🚀 AURIX — Institutional Personal Wealth & Money Management
 
             This release was automatically built, tested, signed, and published by GitHub Actions.
 
             ### 📱 Package & Compatibility Info
-            - **Application ID**: `io.monetra.app`
+            - **Application ID**: `io.aurix.app`
             - **Build Number**: `${{ github.run_number }}`
             - **Signing Signature**: Consistent key signature (supports 1-click update over existing app).
 
             ### 📥 Download & Install
-            Download `MONETRA-latest-release.apk` below and install or update directly on your Android device.
+            Download `AURIX-latest-release.apk` below and install or update directly on your Android device.
           files: release-apk/*.apk
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
