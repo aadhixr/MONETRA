@@ -171,8 +171,8 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
     e.target.value = '';
   };
 
-  const CURRENT_APP_VERSION = 'v1.0.42';
-  const CURRENT_BUILD_NUMBER = '42';
+  const CURRENT_APP_VERSION = 'v1.0.43';
+  const CURRENT_BUILD_NUMBER = '43';
   const LAST_UPDATE_DATE = '19 Nov 2026';
 
   const parseSemVer = (tag: string): number[] => {
