@@ -36,13 +36,16 @@ export class SyncService {
    * Performs an encrypted vault backup to the optional Supabase cloud storage.
    * Uses user_id as primary key to prevent duplicate sync entries.
    */
-  static async backupToCloud(passphrase = 'monetra_local_key'): Promise<boolean> {
+  static async backupToCloud(passphrase = 'monetra_local_key', customUrl?: string, customAnonKey?: string): Promise<boolean> {
     const settings = await SettingsRepository.get();
-    if (!settings.cloud_backup_enabled || !settings.cloud_url || !settings.cloud_anon_key) {
-      throw new Error('Cloud backup is not enabled or credentials are not configured.');
+    const url = customUrl || settings.cloud_url;
+    const anonKey = customAnonKey || settings.cloud_anon_key;
+
+    if (!url || !anonKey) {
+      throw new Error('Supabase cloud credentials (Project URL and Anon Key) missing.');
     }
 
-    const client = this.initClient(settings.cloud_url, settings.cloud_anon_key);
+    const client = this.initClient(url, anonKey);
     if (!client) throw new Error('Supabase client could not be configured.');
 
     // 1. Export local DB payload
@@ -90,8 +93,11 @@ export class SyncService {
       throw new Error(error.message);
     }
 
-    // Update settings with last backup time
+    // Update settings with last backup time and credentials
     await SettingsRepository.update({
+      cloud_backup_enabled: true,
+      cloud_url: url,
+      cloud_anon_key: anonKey,
       last_backup_at: now,
     });
 
@@ -121,13 +127,16 @@ export class SyncService {
   /**
    * Restores database from optional Supabase backup.
    */
-  static async restoreFromCloud(passphrase = 'monetra_local_key'): Promise<boolean> {
+  static async restoreFromCloud(passphrase = 'monetra_local_key', customUrl?: string, customAnonKey?: string): Promise<boolean> {
     const settings = await SettingsRepository.get();
-    if (!settings.cloud_url || !settings.cloud_anon_key) {
-      throw new Error('Supabase cloud credentials missing.');
+    const url = customUrl || settings.cloud_url;
+    const anonKey = customAnonKey || settings.cloud_anon_key;
+
+    if (!url || !anonKey) {
+      throw new Error('Supabase cloud credentials (Project URL and Anon Key) missing.');
     }
 
-    const client = this.initClient(settings.cloud_url, settings.cloud_anon_key);
+    const client = this.initClient(url, anonKey);
     if (!client) throw new Error('Supabase client failed to connect.');
 
     const { data, error } = await client
@@ -142,7 +151,15 @@ export class SyncService {
 
     // Decrypt
     const decryptedJson = await this.decryptData(data.payload, passphrase);
-    return await SettingsRepository.importData(decryptedJson);
+    const success = await SettingsRepository.importData(decryptedJson);
+    if (success) {
+      await SettingsRepository.update({
+        cloud_backup_enabled: true,
+        cloud_url: url,
+        cloud_anon_key: anonKey,
+      });
+    }
+    return success;
   }
 
   /**

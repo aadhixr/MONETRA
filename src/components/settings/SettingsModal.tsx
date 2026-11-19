@@ -61,7 +61,17 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
     setIsSyncing(true);
     setSyncStatusMsg(null);
     try {
-      await SyncService.backupToCloud();
+      const url = cloudUrl.trim();
+      const key = cloudAnonKey.trim();
+      if (!url || !key) {
+        throw new Error('Please enter both Supabase Project URL and Anon Key.');
+      }
+      await updateSettings({
+        cloud_backup_enabled: true,
+        cloud_url: url,
+        cloud_anon_key: key,
+      });
+      await SyncService.backupToCloud('monetra_local_key', url, key);
       setSyncStatusMsg('Encrypted vault successfully backed up to cloud!');
     } catch (err: any) {
       setSyncStatusMsg(`Backup failed: ${err.message}`);
@@ -75,7 +85,17 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
     setIsSyncing(true);
     setSyncStatusMsg(null);
     try {
-      await SyncService.restoreFromCloud();
+      const url = cloudUrl.trim();
+      const key = cloudAnonKey.trim();
+      if (!url || !key) {
+        throw new Error('Please enter both Supabase Project URL and Anon Key.');
+      }
+      await updateSettings({
+        cloud_backup_enabled: true,
+        cloud_url: url,
+        cloud_anon_key: key,
+      });
+      await SyncService.restoreFromCloud('monetra_local_key', url, key);
       await refreshData();
       setSyncStatusMsg('Restored successfully from cloud!');
     } catch (err: any) {
