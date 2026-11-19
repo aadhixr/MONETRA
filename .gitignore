@@ -15,6 +15,7 @@ dist-ssr
 # Keystores & Android local configs
 *.keystore
 *.jks
+!android/app/monetra-release.keystore
 android/local.properties
 android/app/build/
 android/.gradle/
