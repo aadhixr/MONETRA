@@ -57,6 +57,19 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
     setTimeout(() => setSyncStatusMsg(null), 3000);
   };
 
+  const handleTestSupabaseConnection = async () => {
+    setIsSyncing(true);
+    setSyncStatusMsg(null);
+    try {
+      const result = await SyncService.testConnection(cloudUrl, cloudAnonKey);
+      setSyncStatusMsg(result.message);
+    } catch (err: any) {
+      setSyncStatusMsg(`Connection test failed: ${err.message}`);
+    } finally {
+      setIsSyncing(false);
+    }
+  };
+
   const handleCloudBackupNow = async () => {
     setIsSyncing(true);
     setSyncStatusMsg(null);
@@ -431,9 +444,17 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
                 />
               </div>
 
-              <div className="grid grid-cols-2 gap-2 pt-1">
+              <div className="grid grid-cols-3 gap-2 pt-1">
                 <Button
                   variant="outline"
+                  size="sm"
+                  onClick={handleTestSupabaseConnection}
+                  disabled={isSyncing || !cloudUrl || !cloudAnonKey}
+                >
+                  Test Connection
+                </Button>
+                <Button
+                  variant="primary"
                   size="sm"
                   onClick={handleCloudBackupNow}
                   disabled={isSyncing || !cloudUrl || !cloudAnonKey}

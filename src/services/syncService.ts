@@ -33,6 +33,52 @@ export class SyncService {
   }
 
   /**
+   * Diagnostic connection test for user-supplied Supabase URL & Anon Key
+   */
+  static async testConnection(url: string, anonKey: string): Promise<{ success: boolean; message: string }> {
+    const cleanUrl = url.trim();
+    const cleanKey = anonKey.trim();
+
+    if (!cleanUrl || !cleanKey) {
+      return { success: false, message: 'Please enter both Supabase Project URL and Anon Key.' };
+    }
+
+    try {
+      const client = createClient(cleanUrl, cleanKey);
+      const { data, error } = await client.from('monetra_backups').select('user_id').limit(1);
+
+      if (error) {
+        if (error.code === '42P01') {
+          return {
+            success: false,
+            message: "Connected to Supabase, but table 'monetra_backups' was not found. Please run the SQL setup snippet below.",
+          };
+        }
+        if (error.code === '42501' || error.message?.toLowerCase().includes('row-level security') || error.message?.toLowerCase().includes('permission denied') || error.message?.toLowerCase().includes('policy')) {
+          return {
+            success: false,
+            message: "Connected to Supabase, but Row Level Security is blocking access. Run: ALTER TABLE monetra_backups DISABLE ROW LEVEL SECURITY;",
+          };
+        }
+        if (error.code === 'PGRST301' || error.message?.includes('JWT') || error.message?.includes('API key')) {
+          return { success: false, message: 'Invalid Supabase Anon Key. Check Project Settings -> API.' };
+        }
+        return { success: false, message: `Supabase error: ${error.message}` };
+      }
+
+      return { success: true, message: 'Connected successfully to Supabase! Table monetra_backups verified.' };
+    } catch (err: any) {
+      if (err.message?.includes('Failed to fetch') || err.message?.includes('NetworkError') || err.name === 'TypeError') {
+        return {
+          success: false,
+          message: `Could not reach Supabase URL '${cleanUrl}'. Please check for typos or internet connection.`,
+        };
+      }
+      return { success: false, message: `Connection failed: ${err.message}` };
+    }
+  }
+
+  /**
    * Performs an encrypted vault backup to the optional Supabase cloud storage.
    * Uses user_id as primary key to prevent duplicate sync entries.
    */
