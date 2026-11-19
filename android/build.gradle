@@ -29,9 +29,8 @@ subprojects {
         if (project.plugins.hasPlugin('com.android.library') || project.plugins.hasPlugin('com.android.application')) {
             project.android {
                 compileOptions {
-                    def targetVer = JavaVersion.current() >= JavaVersion.VERSION_21 ? JavaVersion.VERSION_21 : JavaVersion.VERSION_17
-                    sourceCompatibility = targetVer
-                    targetCompatibility = targetVer
+                    sourceCompatibility JavaVersion.VERSION_17
+                    targetCompatibility JavaVersion.VERSION_17
                 }
             }
         }
