@@ -1,4 +1,4 @@
-// MONETRA V3 - Cinematic App Opening Splash Animation
+// AURIX - Cinematic App Opening Splash Animation
 import React, { useState, useEffect, useRef } from 'react';
 
 interface SplashScreenProps {
@@ -8,12 +8,13 @@ interface SplashScreenProps {
 
 export const SplashScreen: React.FC<SplashScreenProps> = ({
   onComplete,
-  minDurationMs = 3200,
 }) => {
   const [isFadingOut, setIsFadingOut] = useState(false);
-  const [isVideoLoaded, setIsVideoLoaded] = useState(false);
-  const videoRef = useRef<HTMLVideoElement>(null);
+  const [stage, setStage] = useState<'intro' | 'letters' | 'full'>('intro');
+  const [visibleLetters, setVisibleLetters] = useState<number>(0);
   const hasFinishedRef = useRef(false);
+
+  const WORD = 'AURIX';
 
   const handleFinish = () => {
     if (hasFinishedRef.current) return;
@@ -25,62 +26,92 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({
   };
 
   useEffect(() => {
-    // Safety fallback: if video stalls or fails to play, dismiss after max 9.5s
-    const maxTimer = setTimeout(() => {
-      handleFinish();
-    }, 9500);
+    // Stage 1: Icon entrance and ambient bloom (0 - 500ms)
+    const t1 = setTimeout(() => {
+      setStage('letters');
+    }, 500);
 
-    return () => clearTimeout(maxTimer);
-  }, []);
-
-  useEffect(() => {
-    const video = videoRef.current;
-    if (!video) return;
-
-    // Set playback speed slightly snappier (1.15x) for optimal app opening pace
-    video.playbackRate = 1.15;
-
-    const playPromise = video.play();
-    if (playPromise !== undefined) {
-      playPromise.catch(() => {
-        // Autoplay policy prevented video playback; fallback smoothly
-        setIsVideoLoaded(true);
-      });
+    // Stage 2: Reveal letters A - U - R - I - X sequentially (600ms - 1800ms)
+    const letterTimers: NodeJS.Timeout[] = [];
+    for (let i = 1; i <= WORD.length; i++) {
+      letterTimers.push(
+        setTimeout(() => {
+          setVisibleLetters(i);
+        }, 550 + i * 220)
+      );
     }
+
+    // Stage 3: Full lockup glow and hold (2200ms)
+    const t2 = setTimeout(() => {
+      setStage('full');
+    }, 2000);
+
+    // Stage 4: Smooth transition out into dashboard (3200ms)
+    const t3 = setTimeout(() => {
+      handleFinish();
+    }, 3200);
+
+    return () => {
+      clearTimeout(t1);
+      clearTimeout(t2);
+      clearTimeout(t3);
+      letterTimers.forEach(clearTimeout);
+    };
   }, []);
 
   return (
     <div
       onClick={handleFinish}
-      style={{ backgroundColor: '#010605' }}
+      style={{ backgroundColor: '#08090A' }}
       className={`fixed inset-0 z-[100] flex flex-col items-center justify-center overflow-hidden cursor-pointer select-none transition-all duration-700 ease-out ${
         isFadingOut ? 'opacity-0 scale-105 pointer-events-none' : 'opacity-100 scale-100'
       }`}
       title="Click or tap anywhere to skip"
     >
-      {/* Fullscreen responsive video - seamless boundary matching */}
-      <div className="relative w-full h-full flex items-center justify-center overflow-hidden">
-        <video
-          ref={videoRef}
-          src="/monetra_splash.mp4"
-          autoPlay
-          muted
-          playsInline
-          preload="auto"
-          onLoadedData={() => setIsVideoLoaded(true)}
-          onEnded={handleFinish}
-          onError={handleFinish}
-          style={{
-            backgroundColor: '#010605',
-            maskImage: 'radial-gradient(ellipse 92% 92% at 50% 50%, black 78%, transparent 100%)',
-            WebkitMaskImage: 'radial-gradient(ellipse 92% 92% at 50% 50%, black 78%, transparent 100%)',
-          }}
-          className="w-full h-full object-contain max-h-screen max-w-full select-none pointer-events-none"
-        />
+      {/* Ambient background bloom */}
+      <div className="absolute inset-0 bg-radial-at-c from-[#D4AF37]/10 via-transparent to-[#08090A] pointer-events-none animate-pulse" />
+
+      {/* Main Brand Lockup */}
+      <div className="relative flex flex-col items-center justify-center p-6 space-y-6">
+        {/* Animated App Squircle Icon */}
+        <div className="relative transition-all duration-1000 ease-out transform">
+          <div className="absolute -inset-4 bg-gradient-to-r from-[#D4AF37]/20 to-[#F8FAFC]/10 rounded-3xl blur-2xl opacity-60 animate-pulse pointer-events-none" />
+          <img
+            src="/logo.jpg"
+            alt="AURIX"
+            className="w-28 h-28 sm:w-36 sm:h-36 rounded-3xl shadow-2xl border border-[#30352B]/80 object-cover ring-1 ring-[#D4AF37]/40 relative z-10 transition-transform duration-700 hover:scale-105"
+          />
+        </div>
+
+        {/* Sequential Typographic Reveal: A U R I X */}
+        <div className="flex flex-col items-center space-y-2 relative z-10">
+          <div className="flex items-center space-x-3 sm:space-x-4">
+            {WORD.split('').map((char, idx) => (
+              <span
+                key={idx}
+                className={`text-2xl sm:text-3xl font-black tracking-[0.25em] transition-all duration-500 ease-out ${
+                  idx < visibleLetters
+                    ? 'opacity-100 translate-y-0 text-white scale-100 drop-shadow-[0_0_12px_rgba(212,175,55,0.4)]'
+                    : 'opacity-0 translate-y-2 text-[#A1A69A]/30 scale-90'
+                }`}
+              >
+                {char}
+              </span>
+            ))}
+          </div>
+
+          <div
+            className={`text-[10px] sm:text-xs font-mono tracking-[0.3em] uppercase text-[#D4AF37]/90 transition-all duration-700 ${
+              stage === 'full' ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2'
+            }`}
+          >
+            Institutional Wealth & Ledger
+          </div>
+        </div>
       </div>
 
       {/* Subtle Skip Prompt for swift UX */}
-      <div className="absolute bottom-6 sm:bottom-8 z-10 flex items-center space-x-2 text-[#A1A69A]/50 hover:text-[#E7FF32] transition-colors text-xs font-mono tracking-widest uppercase">
+      <div className="absolute bottom-6 sm:bottom-8 z-10 flex items-center space-x-2 text-[#A1A69A]/40 hover:text-[#D4AF37] transition-colors text-xs font-mono tracking-widest uppercase">
         <span>Tap anywhere to enter</span>
         <span className="text-[10px] animate-pulse">❯❯</span>
       </div>

@@ -13,6 +13,7 @@ export interface SyncStatus {
 
 export class SyncService {
   private static client: SupabaseClient | null = null;
+  private static isSyncingInProgress = false;
 
   /**
    * Initializes or updates the optional Supabase client.
@@ -33,6 +34,7 @@ export class SyncService {
 
   /**
    * Performs an encrypted vault backup to the optional Supabase cloud storage.
+   * Uses user_id as primary key to prevent duplicate sync entries.
    */
   static async backupToCloud(passphrase = 'monetra_local_key'): Promise<boolean> {
     const settings = await SettingsRepository.get();
@@ -48,27 +50,72 @@ export class SyncService {
 
     // 2. Encrypt payload using Web Crypto AES-GCM
     const encryptedPayload = await this.encryptData(rawDataJson, passphrase);
+    const now = new Date().toISOString();
 
-    // 3. Upsert into Supabase user_backups table
-    const { error } = await client
+    // 3. Upsert into Supabase monetra_backups table (user_id primary key prevents duplicates)
+    let { error } = await client
       .from('monetra_backups')
       .upsert({
         user_id: settings.id,
         payload: encryptedPayload,
-        updated_at: new Date().toISOString(),
+        updated_at: now,
       });
 
+    // Handle missing table error by attempting auto-creation RPC if configured
     if (error) {
+      if (error.code === '42P01' || error.message?.includes('monetra_backups')) {
+        try {
+          // Attempt RPC table creation fallback
+          await client.rpc('create_monetra_backups_table');
+          // Retry upsert
+          const retry = await client
+            .from('monetra_backups')
+            .upsert({
+              user_id: settings.id,
+              payload: encryptedPayload,
+              updated_at: now,
+            });
+          error = retry.error;
+        } catch (rpcErr) {
+          // Fall through to throw standard table missing error
+        }
+      }
+    }
+
+    if (error) {
+      if (error.code === '42P01' || error.message?.includes('monetra_backups')) {
+        throw new Error("Table 'monetra_backups' not found in Supabase. Please run: CREATE TABLE monetra_backups (user_id text primary key, payload text, updated_at text);");
+      }
       console.error('Supabase backup error:', error);
       throw new Error(error.message);
     }
 
     // Update settings with last backup time
     await SettingsRepository.update({
-      last_backup_at: new Date().toISOString(),
+      last_backup_at: now,
     });
 
     return true;
+  }
+
+  /**
+   * Automatic background sync triggered whenever new data is added or modified.
+   * Runs in non-blocking mode without duplicating rows.
+   */
+  static async autoSyncInBackground(): Promise<void> {
+    if (this.isSyncingInProgress) return;
+    try {
+      const settings = await SettingsRepository.get();
+      if (!settings.cloud_backup_enabled || !settings.cloud_url || !settings.cloud_anon_key) {
+        return;
+      }
+      this.isSyncingInProgress = true;
+      await this.backupToCloud();
+    } catch (err) {
+      console.warn('Background Cloud Sync silent warning:', err);
+    } finally {
+      this.isSyncingInProgress = false;
+    }
   }
 
   /**

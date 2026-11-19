@@ -123,15 +123,15 @@ export const Header: React.FC<HeaderProps> = ({
           <div className="flex items-center space-x-2.5">
             <img
               src="/logo.jpg"
-              alt="Monetra"
+              alt="AURIX"
               className="w-9 h-9 rounded-xl shadow-md border border-[#30352B]/70 object-cover shrink-0 cursor-pointer hover:scale-105 transition-transform"
               onClick={onOpenSettings}
-              title="Monetra V3 - Open Settings"
+              title="AURIX - Open Settings"
             />
             <div className="hidden min-[480px]:block cursor-pointer" onClick={onOpenSettings}>
               <div className="font-extrabold text-sm tracking-widest text-white flex items-center gap-1.5">
-                MONETRA
-                <span className="text-[9px] font-bold px-1.5 py-0.2 rounded-full bg-[#1C2019] text-[#A8E66A] border border-[#30352B]">V3</span>
+                AURIX
+                <span className="text-[9px] font-bold px-1.5 py-0.2 rounded-full bg-[#1C2019] text-[#D4AF37] border border-[#D4AF37]/40">PRO</span>
               </div>
               <div className="text-[10px] text-[#A1A69A]/70 uppercase tracking-wider font-medium">Wealth Ledger</div>
             </div>

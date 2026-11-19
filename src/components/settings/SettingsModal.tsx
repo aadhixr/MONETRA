@@ -203,15 +203,15 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
           <div className="flex items-center space-x-3.5">
             <img
               src="/logo.jpg"
-              alt="Monetra Icon"
-              className="w-13 h-13 rounded-2xl shadow-xl border border-[#30352B] object-cover ring-2 ring-[#E7FF32]/20"
+              alt="AURIX Icon"
+              className="w-13 h-13 rounded-2xl shadow-xl border border-[#30352B] object-cover ring-2 ring-[#D4AF37]/30"
             />
             <div>
               <div className="flex items-center gap-2">
-                <h3 className="font-black text-base text-white tracking-wider">MONETRA</h3>
-                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#E7FF32]/10 text-[#E7FF32] border border-[#E7FF32]/30">V3 LUXE</span>
+                <h3 className="font-black text-base text-white tracking-wider">AURIX</h3>
+                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#D4AF37]/15 text-[#D4AF37] border border-[#D4AF37]/40">AURIX PRO</span>
               </div>
-              <p className="text-xs text-[#A1A69A] mt-0.5">Privacy-First Dark Fintech & Ledger</p>
+              <p className="text-xs text-[#A1A69A] mt-0.5">Institutional Wealth & Precision Ledger</p>
               <div className="text-[10px] text-[#A8E66A] font-mono mt-0.5">100% On-Device • Zero Telemetry</div>
             </div>
           </div>

@@ -23,6 +23,7 @@ import { RecurringRepository } from '../db/repositories/recurringRepository';
 import { DebtRepository } from '../db/repositories/debtRepository';
 import { SalaryRepository } from '../db/repositories/salaryRepository';
 import { SettingsRepository } from '../db/repositories/settingsRepository';
+import { SyncService } from '../services/syncService';
 import { AccountingEngine } from '../engine/accountingEngine';
 import { applyThemeToDocument } from '../engine/themes';
 
@@ -154,6 +155,10 @@ export const FinancialProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       setDebts(debtsList);
       setSalaryRecords(salaries);
       setSettings(appSet);
+
+      // Trigger automatic live background sync if Supabase cloud backup is enabled
+      // Never duplicates rows because user_id is the primary key in Supabase!
+      SyncService.autoSyncInBackground();
     } catch (err) {
       console.error('Error loading Monetra database:', err);
     } finally {
