@@ -66,11 +66,9 @@ export class SyncService {
 
     // Handle missing table error by attempting auto-creation RPC if configured
     if (error) {
-      if (error.code === '42P01' || error.message?.includes('monetra_backups')) {
+      if (error.code === '42P01') {
         try {
-          // Attempt RPC table creation fallback
           await client.rpc('create_monetra_backups_table');
-          // Retry upsert
           const retry = await client
             .from('monetra_backups')
             .upsert({
@@ -80,14 +78,17 @@ export class SyncService {
             });
           error = retry.error;
         } catch (rpcErr) {
-          // Fall through to throw standard table missing error
+          // Fall through
         }
       }
     }
 
     if (error) {
-      if (error.code === '42P01' || error.message?.includes('monetra_backups')) {
-        throw new Error("Table 'monetra_backups' not found in Supabase. Please run: CREATE TABLE monetra_backups (user_id text primary key, payload text, updated_at text);");
+      if (error.code === '42P01') {
+        throw new Error("Table 'monetra_backups' not found in Supabase. Run SQL: CREATE TABLE monetra_backups (user_id text primary key, payload text, updated_at text); ALTER TABLE monetra_backups DISABLE ROW LEVEL SECURITY;");
+      }
+      if (error.code === '42501' || error.message?.toLowerCase().includes('row-level security') || error.message?.toLowerCase().includes('permission denied') || error.message?.toLowerCase().includes('policy')) {
+        throw new Error("Supabase RLS Permission Error: Please run this in Supabase SQL Editor: ALTER TABLE monetra_backups DISABLE ROW LEVEL SECURITY;");
       }
       console.error('Supabase backup error:', error);
       throw new Error(error.message);
@@ -144,6 +145,16 @@ export class SyncService {
       .select('payload')
       .eq('user_id', settings.id)
       .single();
+
+    if (error) {
+      if (error.code === 'PGRST116') {
+        throw new Error('No cloud backup record found for this user account.');
+      }
+      if (error.code === '42501' || error.message?.toLowerCase().includes('row-level security') || error.message?.toLowerCase().includes('permission denied') || error.message?.toLowerCase().includes('policy')) {
+        throw new Error("Supabase RLS Permission Error: Please run this in Supabase SQL Editor: ALTER TABLE monetra_backups DISABLE ROW LEVEL SECURITY;");
+      }
+      throw new Error(error.message);
+    }
 
     if (error || !data) {
       throw new Error('No cloud backup found for this account.');

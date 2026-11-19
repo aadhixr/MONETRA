@@ -451,9 +451,10 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
               </div>
 
               <div className="p-2.5 bg-[#151812] border border-[#30352B] rounded-xl text-[10px] text-[#A1A69A]">
-                <div className="font-bold text-white mb-1">Required Supabase Table SQL:</div>
-                <code className="block bg-[#090B08] p-1.5 rounded text-[#A8E66A] font-mono select-all overflow-x-auto">
-                  CREATE TABLE monetra_backups (user_id text primary key, payload text, updated_at text);
+                <div className="font-bold text-white mb-1">Required Supabase Setup SQL (Run Both Lines):</div>
+                <code className="block bg-[#090B08] p-2 rounded text-[#A8E66A] font-mono select-all overflow-x-auto whitespace-pre-wrap leading-relaxed">
+                  CREATE TABLE IF NOT EXISTS monetra_backups (user_id text primary key, payload text, updated_at text);{"\n"}
+                  ALTER TABLE monetra_backups DISABLE ROW LEVEL SECURITY;
                 </code>
               </div>
             </div>
