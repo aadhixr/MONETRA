@@ -36,11 +36,18 @@ export class SyncService {
    * Diagnostic connection test for user-supplied Supabase URL & Anon Key
    */
   static async testConnection(url: string, anonKey: string): Promise<{ success: boolean; message: string }> {
-    const cleanUrl = url.trim();
+    const cleanUrl = url.trim().replace(/\/+$/, '');
     const cleanKey = anonKey.trim();
 
     if (!cleanUrl || !cleanKey) {
       return { success: false, message: 'Please enter both Supabase Project URL and Anon Key.' };
+    }
+
+    if (!cleanUrl.startsWith('https://') || !cleanUrl.includes('.supabase.co')) {
+      return {
+        success: false,
+        message: "Invalid Supabase URL format. It should look like 'https://your-ref.supabase.co'. Copy it from Supabase -> Project Settings -> API.",
+      };
     }
 
     try {
@@ -48,33 +55,43 @@ export class SyncService {
       const { data, error } = await client.from('monetra_backups').select('user_id').limit(1);
 
       if (error) {
-        if (error.code === '42P01') {
+        if (error.code === '42P01' || error.message?.includes('does not exist')) {
           return {
             success: false,
-            message: "Connected to Supabase, but table 'monetra_backups' was not found. Please run the SQL setup snippet below.",
+            message: "Table 'monetra_backups' not found in Supabase. Run the SQL setup commands in Supabase SQL Editor.",
           };
         }
-        if (error.code === '42501' || error.message?.toLowerCase().includes('row-level security') || error.message?.toLowerCase().includes('permission denied') || error.message?.toLowerCase().includes('policy')) {
+        if (error.message?.toLowerCase().includes('data api') || error.message?.toLowerCase().includes('api disabled')) {
           return {
             success: false,
-            message: "Connected to Supabase, but Row Level Security is blocking access. Run: ALTER TABLE monetra_backups DISABLE ROW LEVEL SECURITY;",
+            message: "Supabase Data API Disabled: In Supabase Dashboard -> Table Editor -> monetra_backups, click 'Data API settings' to enable access.",
           };
         }
-        if (error.code === 'PGRST301' || error.message?.includes('JWT') || error.message?.includes('API key')) {
-          return { success: false, message: 'Invalid Supabase Anon Key. Check Project Settings -> API.' };
+        if (
+          error.code === '42501' ||
+          error.code === 'PGRST301' ||
+          error.message?.toLowerCase().includes('row-level security') ||
+          error.message?.toLowerCase().includes('permission denied') ||
+          error.message?.toLowerCase().includes('policy') ||
+          error.message?.toLowerCase().includes('jwt')
+        ) {
+          return {
+            success: false,
+            message: `Supabase Permission Error (${error.code || 'RLS'}): If table badge says API DISABLED, enable Data API settings for monetra_backups in Supabase.`,
+          };
         }
-        return { success: false, message: `Supabase error: ${error.message}` };
+        return { success: false, message: `Supabase error (${error.code || 'API'}): ${error.message}` };
       }
 
-      return { success: true, message: 'Connected successfully to Supabase! Table monetra_backups verified.' };
+      return { success: true, message: '✅ Connected successfully to Supabase! Table monetra_backups verified.' };
     } catch (err: any) {
       if (err.message?.includes('Failed to fetch') || err.message?.includes('NetworkError') || err.name === 'TypeError') {
         return {
           success: false,
-          message: `Could not reach Supabase URL '${cleanUrl}'. Please check for typos or internet connection.`,
+          message: `Could not reach '${cleanUrl}'. Please check your Supabase Project URL for typos or verify your internet connection.`,
         };
       }
-      return { success: false, message: `Connection failed: ${err.message}` };
+      return { success: false, message: `Connection test failed: ${err.message}` };
     }
   }
 

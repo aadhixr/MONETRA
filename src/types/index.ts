@@ -180,6 +180,12 @@ export type ThemeId =
   | 'crimson_noir'
   | 'slate_minimal'
   | 'nordic_frost'
+  | 'ferrari_crimson'
+  | 'velvet_rose'
+  | 'royal_sapphire'
+  | 'aquamarine_ocean'
+  | 'platinum_silver'
+  | 'deep_cosmos'
   | 'dark'
   | 'light';
 
@@ -197,6 +203,7 @@ export interface AppSettings {
   cloud_backup_enabled: boolean;
   cloud_url?: string;
   cloud_anon_key?: string;
+  gdrive_token?: string;
   last_backup_at?: string;
   onboarding_completed: boolean;
   enable_ai_local: boolean;

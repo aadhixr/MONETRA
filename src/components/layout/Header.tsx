@@ -13,6 +13,7 @@ import {
   Sparkles,
   Plus,
   RotateCcw,
+  ShieldAlert,
 } from 'lucide-react';
 import { useFinancial } from '../../context/FinancialContext';
 import {
@@ -105,16 +106,19 @@ export const Header: React.FC<HeaderProps> = ({
     'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
   ];
 
+  const isAdminMode = typeof localStorage !== 'undefined' && localStorage.getItem('aurix_admin_authenticated') === 'true';
+
   const navTabs = [
     { id: 'home' as TabType, label: 'Home', icon: Home },
     { id: 'budget' as TabType, label: 'Budget', icon: PieChart },
     { id: 'savings' as TabType, label: 'Savings', icon: PiggyBank },
     { id: 'insights' as TabType, label: 'Insights', icon: Sparkles },
+    ...(isAdminMode ? [{ id: 'admin' as TabType, label: 'Admin 👑', icon: ShieldAlert }] : []),
   ];
 
   return (
     <header
-      className="px-4 sm:px-6 lg:px-8 pb-2.5 bg-[#090B08]/95 backdrop-blur-md sticky top-0 z-30 border-b border-[#30352B]/50 transition-all"
+      className="px-4 sm:px-6 lg:px-8 pb-2.5 bg-[#090B08] sticky top-0 z-50 border-b border-[#30352B]/50 transition-all"
       style={{ paddingTop: 'calc(env(safe-area-inset-top, 0px) + 0.75rem)' }}
     >
       <div className="w-full max-w-7xl mx-auto flex items-center justify-between gap-3 sm:gap-4">
@@ -134,25 +138,6 @@ export const Header: React.FC<HeaderProps> = ({
                 <span className="text-[9px] font-bold px-1.5 py-0.2 rounded-full bg-[#1C2019] text-[#D4AF37] border border-[#D4AF37]/40">PRO</span>
               </div>
               <div className="text-[10px] text-[#A1A69A]/70 uppercase tracking-wider font-medium">Wealth Ledger</div>
-            </div>
-          </div>
-
-          <div className="h-5 w-px bg-[#30352B]/80 hidden min-[480px]:block" />
-
-          <button
-            onClick={onOpenSettings}
-            className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-[#1C2019] border border-[#30352B] flex items-center justify-center text-[#E7FF32] font-bold text-xs hover:border-[#E7FF32] transition-colors shadow-sm cursor-pointer"
-            title="Open Profile & Settings"
-          >
-            {userName.charAt(0).toUpperCase()}
-          </button>
-          <div className="hidden min-[680px]:block cursor-pointer" onClick={onOpenSettings} title="Click to open Profile">
-            <div className="flex items-center space-x-1.5">
-              <span className="text-xs text-[#A1A69A]">{getGreeting()},</span>
-              <span className="text-xs font-semibold text-white">{userName}</span>
-            </div>
-            <div className="text-[11px] text-[#A1A69A]/80 flex items-center space-x-1">
-              <span>{new Date().toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })}</span>
             </div>
           </div>
         </div>

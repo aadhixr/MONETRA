@@ -26,24 +26,33 @@ export const RecentTransactions: React.FC<RecentTransactionsProps> = ({
     deleteTransaction,
     duplicateTransaction,
     currentMonth,
+    selectedAccountFilter,
   } = useFinancial();
 
   const [selectedTxn, setSelectedTxn] = useState<Transaction | null>(null);
   const [showReceiptModal, setShowReceiptModal] = useState(false);
 
-  // Filter and sort transactions strictly belonging to the selected month
+  const activeFilteredAccount = selectedAccountFilter ? accounts.find((a) => a.id === selectedAccountFilter) : null;
+
+  // Filter and sort transactions strictly belonging to the selected month and active account filter
   const monthAllTxns = transactions
-    .filter((t) => !t.is_deleted && t.date.startsWith(currentMonth))
+    .filter((t) => {
+      if (t.is_deleted || !t.date.startsWith(currentMonth)) return false;
+      if (selectedAccountFilter) {
+        return t.account_id === selectedAccountFilter || t.to_account_id === selectedAccountFilter;
+      }
+      return true;
+    })
     .sort((a, b) => b.date.localeCompare(a.date) || b.created_at.localeCompare(a.created_at));
   const monthTxns = monthAllTxns.slice(0, 6);
 
   // Exact Total Money Incoming and Total Money Spent for Ledger view
   const monthIncomingPaise = monthAllTxns
-    .filter((t) => t.type === 'income')
+    .filter((t) => t.type === 'income' || (t.type === 'transfer' && selectedAccountFilter && t.to_account_id === selectedAccountFilter))
     .reduce((sum, t) => sum + (t.amount_paise || 0), 0);
 
   const monthSpentPaise = monthAllTxns
-    .filter((t) => t.type === 'expense')
+    .filter((t) => t.type === 'expense' || (t.type === 'transfer' && selectedAccountFilter && t.account_id === selectedAccountFilter))
     .reduce((sum, t) => sum + (t.amount_paise || 0), 0);
 
   const getCategory = (catId: string) => categories.find((c) => c.id === catId);
@@ -68,10 +77,10 @@ export const RecentTransactions: React.FC<RecentTransactionsProps> = ({
       {/* Header with View All action */}
       <div className="flex items-center justify-between mb-3 px-1">
         <div className="flex items-center space-x-2">
-          <h3 className="text-xs font-bold text-white tracking-wide uppercase">
-            Ledger Entries ({formatMonthShort(currentMonth)})
+          <h3 className="text-xs font-bold text-white tracking-wide uppercase truncate max-w-[210px] sm:max-w-xs">
+            {activeFilteredAccount ? `${activeFilteredAccount.name} Ledger` : `Ledger Entries (${formatMonthShort(currentMonth)})`}
           </h3>
-          <span className="text-[10px] text-[#A8E66A] flex items-center">
+          <span className="text-[10px] text-[#A8E66A] flex items-center shrink-0">
             <CheckCircle2 className="w-3 h-3 mr-0.5" /> All Validated OK
           </span>
         </div>

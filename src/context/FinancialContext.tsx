@@ -23,9 +23,13 @@ import { RecurringRepository } from '../db/repositories/recurringRepository';
 import { DebtRepository } from '../db/repositories/debtRepository';
 import { SalaryRepository } from '../db/repositories/salaryRepository';
 import { SettingsRepository } from '../db/repositories/settingsRepository';
+import { setGlobalCurrencySymbol } from '../engine/currency';
 import { SyncService } from '../services/syncService';
 import { AccountingEngine } from '../engine/accountingEngine';
 import { applyThemeToDocument } from '../engine/themes';
+import { LicenseService } from '../services/licenseService';
+import { ActivationGateModal } from '../components/licensing/ActivationGateModal';
+import { AdminPortalModal } from '../components/licensing/AdminPortalModal';
 
 interface FinancialContextType {
   // State
@@ -40,6 +44,12 @@ interface FinancialContextType {
   debts: Debt[];
   salaryRecords: SalaryRecord[];
   settings: AppSettings | null;
+
+  // Single-Device License & Admin Portal State
+  isLicensed: boolean;
+  isAdminPortalOpen: boolean;
+  openAdminPortal: () => void;
+  closeAdminPortal: () => void;
 
   // Navigation & Time scope
   currentMonth: string; // 'YYYY-MM'
@@ -67,6 +77,7 @@ interface FinancialContextType {
   addAccount: (data: Omit<Account, 'id' | 'created_at' | 'updated_at'>) => Promise<Account>;
   updateAccount: (id: string, updates: Partial<Account>) => Promise<void>;
   archiveAccount: (id: string) => Promise<void>;
+  deleteAccount: (id: string) => Promise<void>;
 
   setMonthlyBudget: (totalLimitPaise: number, rollover?: boolean) => Promise<void>;
   setCategoryBudget: (categoryId: string, allocatedPaise: number) => Promise<void>;
@@ -107,19 +118,36 @@ export const FinancialProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   const [salaryRecords, setSalaryRecords] = useState<SalaryRecord[]>([]);
   const [settings, setSettings] = useState<AppSettings | null>(null);
 
-  // Month navigation: default to current system year-month (e.g. '2026-11')
+  // License & Admin Portal State
+  const [isLicensed, setIsLicensed] = useState<boolean>(() => LicenseService.isAppLicensed());
+  const [isActivationGateOpen, setIsActivationGateOpen] = useState<boolean>(() => !LicenseService.isAppLicensed());
+  const [isAdminPortalOpen, setIsAdminPortalOpen] = useState<boolean>(false);
+
+  const openAdminPortal = useCallback(() => setIsAdminPortalOpen(true), []);
+  const closeAdminPortal = useCallback(() => setIsAdminPortalOpen(false), []);
+
+  // Month navigation & Persistent Account Selection
   const [currentMonth, setCurrentMonth] = useState<string>(() => {
     return new Date().toISOString().slice(0, 7);
   });
-  const [selectedAccountFilter, setSelectedAccountFilter] = useState<string | null>(null);
+  const [selectedAccountFilter, setSelectedAccountFilterState] = useState<string | null>(() => {
+    return localStorage.getItem('aurix_last_selected_account_id');
+  });
+
+  const setSelectedAccountFilter = useCallback((id: string | null) => {
+    setSelectedAccountFilterState(id);
+    if (id) {
+      localStorage.setItem('aurix_last_selected_account_id', id);
+    } else {
+      localStorage.removeItem('aurix_last_selected_account_id');
+    }
+  }, []);
 
   const loadData = useCallback(async () => {
     try {
       await migrateLegacyMonetraData();
       await initializeDatabaseIfEmpty();
       await consolidateUserAccounts();
-      // Automatically establish monthly budget from credited salary:
-      // "WHEN EVER THE SALRY CREDITED THAT MY BUDGET FOR THE MONTH TOO OKAY"
       await BudgetRepository.syncSalaryBudget(currentMonth);
 
       const [
@@ -156,6 +184,30 @@ export const FinancialProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       setDebts(debtsList);
       setSalaryRecords(salaries);
       setSettings(appSet);
+      if (appSet?.currency_symbol) {
+        setGlobalCurrencySymbol(appSet.currency_symbol);
+      }
+
+      // Live License Check against Firebase (Enforces instant remote revocation & unbinding)
+      const isLiveValid = await LicenseService.checkLiveLicenseStatus();
+      if (!isLiveValid) {
+        setIsLicensed(false);
+        setIsActivationGateOpen(true);
+      } else {
+        setIsLicensed(true);
+      }
+
+      // Persistence: Restore last selected account from localStorage or default to Primary Bank
+      const savedAccId = localStorage.getItem('aurix_last_selected_account_id');
+      const validSavedAcc = savedAccId ? accs.find((a: Account) => !a.is_archived && a.id === savedAccId) : null;
+      const defaultPrimary = accs.find((a: Account) => !a.is_archived && a.type !== 'savings') || accs[0];
+
+      if (validSavedAcc) {
+        setSelectedAccountFilterState(validSavedAcc.id);
+      } else if (defaultPrimary) {
+        setSelectedAccountFilterState(defaultPrimary.id);
+        localStorage.setItem('aurix_last_selected_account_id', defaultPrimary.id);
+      }
 
       // Trigger automatic live background sync if Supabase cloud backup is enabled
       // Never duplicates rows because user_id is the primary key in Supabase!
@@ -257,6 +309,11 @@ export const FinancialProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     await loadData();
   };
 
+  const deleteAccount = async (id: string) => {
+    await AccountRepository.delete(id);
+    await loadData();
+  };
+
   const setMonthlyBudget = async (totalLimitPaise: number, rollover = false) => {
     const b = await BudgetRepository.setMonthlyBudget(currentMonth, totalLimitPaise, rollover);
     setMonthlyBudgetState(b);
@@ -346,6 +403,9 @@ export const FinancialProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     if (updates.theme) {
       applyThemeToDocument(updates.theme);
     }
+    if (updates.currency_symbol) {
+      setGlobalCurrencySymbol(updates.currency_symbol);
+    }
     const s = await SettingsRepository.update(updates);
     setSettings(s);
   };
@@ -384,6 +444,7 @@ export const FinancialProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         addAccount,
         updateAccount,
         archiveAccount,
+        deleteAccount,
         setMonthlyBudget,
         setCategoryBudget,
         copyPreviousMonthBudget,
@@ -401,9 +462,31 @@ export const FinancialProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         markSalaryReceived,
         deleteSalaryRecord,
         updateSettings,
+        isLicensed,
+        isAdminPortalOpen,
+        openAdminPortal,
+        closeAdminPortal,
       }}
     >
       {children}
+
+      {/* Single-Device License Activation Gate */}
+      <ActivationGateModal
+        isOpen={isActivationGateOpen}
+        onActivated={() => {
+          setIsLicensed(true);
+          setIsActivationGateOpen(false);
+        }}
+        onOpenAdminPortal={() => {
+          setIsAdminPortalOpen(true);
+        }}
+      />
+
+      {/* Owner Admin License Portal Dashboard */}
+      <AdminPortalModal
+        isOpen={isAdminPortalOpen}
+        onClose={() => setIsAdminPortalOpen(false)}
+      />
     </FinancialContext.Provider>
   );
 };

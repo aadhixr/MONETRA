@@ -21,6 +21,7 @@ export const MonthlyOverview: React.FC<MonthlyOverviewProps> = ({ onNavigateToBu
     accounts,
     spendingAccounts,
     savingsAccounts,
+    selectedAccountFilter,
     liquidSpendingBalancePaise,
     totalSavingsBalancePaise,
     totalNetWorthPaise,
@@ -29,8 +30,16 @@ export const MonthlyOverview: React.FC<MonthlyOverviewProps> = ({ onNavigateToBu
   // Active Popup Modal State: 'incoming' | 'spent' | 'balance' | null
   const [activeModal, setActiveModal] = useState<'incoming' | 'spent' | 'balance' | null>(null);
 
+  const activeAccount = useMemo(() => {
+    if (selectedAccountFilter) {
+      return accounts.find((a) => a.id === selectedAccountFilter) || spendingAccounts[0];
+    }
+    return spendingAccounts[0] || accounts[0];
+  }, [accounts, selectedAccountFilter, spendingAccounts]);
+
+  const activeAccountName = activeAccount?.name || 'Primary Bank';
+
   const hasBudget = (monthlyBudget && monthlyBudget.total_limit_paise > 0) || monthlyLedger.budget_total_paise > 0;
-  const budgetLimit = monthlyBudget?.total_limit_paise || monthlyLedger.budget_total_paise;
 
   // Format month name
   const formatMonthName = (mStr: string) => {
@@ -45,6 +54,32 @@ export const MonthlyOverview: React.FC<MonthlyOverviewProps> = ({ onNavigateToBu
       (t) => !t.is_deleted && t.date && t.date.startsWith(currentMonth)
     );
   }, [transactions, currentMonth]);
+
+  // Live account-specific income, spent, opening, and closing figures for the month
+  const accountMonthMetrics = useMemo(() => {
+    if (!activeAccount) {
+      return {
+        openingPaise: monthlyLedger.opening_balance_paise,
+        incomePaise: monthlyLedger.total_income_paise,
+        spentPaise: monthlyLedger.total_spent_paise || monthlyLedger.total_expenses_paise,
+        closingPaise: monthlyLedger.closing_balance_paise,
+      };
+    }
+
+    const openingPaise = activeAccount.opening_balance_paise || 0;
+
+    const incomePaise = monthTxns
+      .filter((t) => (t.type === 'income' && t.account_id === activeAccount.id) || (t.type === 'transfer' && t.to_account_id === activeAccount.id))
+      .reduce((sum, t) => sum + (t.amount_paise || 0), 0);
+
+    const spentPaise = monthTxns
+      .filter((t) => (t.type === 'expense' && t.account_id === activeAccount.id) || (t.type === 'transfer' && t.account_id === activeAccount.id))
+      .reduce((sum, t) => sum + (t.amount_paise || 0), 0);
+
+    const closingPaise = openingPaise + incomePaise - spentPaise;
+
+    return { openingPaise, incomePaise, spentPaise, closingPaise };
+  }, [activeAccount, monthTxns, monthlyLedger]);
 
   const spendingAccountIds = useMemo(() => {
     return new Set(accounts.filter((a) => !a.is_archived && a.type !== 'savings').map((a) => a.id));
@@ -191,15 +226,15 @@ export const MonthlyOverview: React.FC<MonthlyOverviewProps> = ({ onNavigateToBu
               Opening Balance (Start of Month)
             </span>
             <span className="text-sm font-bold text-white num-tabular">
-              {formatPaise(monthlyLedger.opening_balance_paise)}
+              {formatPaise(accountMonthMetrics.openingPaise)}
             </span>
           </div>
           <div className="text-right">
-            <span className="text-[10px] text-[#A1A69A] uppercase tracking-wider block">
-              Closing Balance (Available at End)
+            <span className="text-[10px] text-[#A1A69A] uppercase tracking-wider block truncate">
+              Closing Balance ({activeAccountName})
             </span>
             <span className="text-sm font-bold text-[#E7FF32] num-tabular">
-              {formatPaise(monthlyLedger.closing_balance_paise)}
+              {formatPaise(accountMonthMetrics.closingPaise)}
             </span>
           </div>
         </div>
@@ -224,14 +259,14 @@ export const MonthlyOverview: React.FC<MonthlyOverviewProps> = ({ onNavigateToBu
               <ChevronRight className="w-3 h-3 text-[#A1A69A] group-hover:text-[#A8E66A] transition-colors" />
             </div>
             <div className="mt-1.5 text-sm sm:text-base lg:text-lg font-black text-[#A8E66A] num-tabular truncate">
-              +{formatPaise(monthlyLedger.total_income_paise)}
+              +{formatPaise(accountMonthMetrics.incomePaise)}
             </div>
             <span className="text-[9px] sm:text-[10px] text-[#A1A69A] block mt-0.5 truncate">
               Money Credited
             </span>
           </div>
 
-          {/* 2. Total Money Spent Tile (Includes Transfers to Savings) */}
+          {/* 2. Total Money Spent Tile */}
           <div
             onClick={() => setActiveModal('spent')}
             className="p-2.5 sm:p-3 bg-[#151812] border border-[#30352B] hover:border-[#FF6868] rounded-2xl cursor-pointer transition-all active:scale-[0.98] group shadow-sm"
@@ -249,14 +284,14 @@ export const MonthlyOverview: React.FC<MonthlyOverviewProps> = ({ onNavigateToBu
               <ChevronRight className="w-3 h-3 text-[#A1A69A] group-hover:text-[#FF6868] transition-colors" />
             </div>
             <div className="mt-1.5 text-sm sm:text-base lg:text-lg font-black text-[#FF6868] num-tabular truncate">
-              -{formatPaise(monthlyLedger.total_spent_paise || monthlyLedger.total_expenses_paise)}
+              -{formatPaise(accountMonthMetrics.spentPaise)}
             </div>
             <span className="text-[9px] sm:text-[10px] text-[#A1A69A] block mt-0.5 truncate">
               Debits & Transfers
             </span>
           </div>
 
-          {/* 3. Balance Tile (Simply BALANCE, Short & Clear) */}
+          {/* 3. Balance Tile */}
           <div
             onClick={() => setActiveModal('balance')}
             className="p-2.5 sm:p-3 bg-[#151812] border border-[#30352B] hover:border-[#E7FF32] rounded-2xl cursor-pointer transition-all active:scale-[0.98] group shadow-sm"
@@ -274,10 +309,10 @@ export const MonthlyOverview: React.FC<MonthlyOverviewProps> = ({ onNavigateToBu
               <ChevronRight className="w-3 h-3 text-[#A1A69A] group-hover:text-[#E7FF32] transition-colors" />
             </div>
             <div className="mt-1.5 text-sm sm:text-base lg:text-lg font-black text-[#E7FF32] num-tabular truncate">
-              {formatPaise(monthlyLedger.closing_balance_paise)}
+              {formatPaise(accountMonthMetrics.closingPaise)}
             </div>
             <span className="text-[9px] sm:text-[10px] text-[#A1A69A] block mt-0.5 truncate">
-              Primary Account Only
+              {activeAccountName} Only
             </span>
           </div>
         </div>

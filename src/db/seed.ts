@@ -178,20 +178,12 @@ export async function consolidateUserAccounts(): Promise<void> {
   await syncDefaultCategories();
 
   const allAccounts = await db.accounts.toArray();
-  if (allAccounts.length === 0) return;
+  const activeAccounts = allAccounts.filter((a) => !a.is_archived);
 
-  const now = new Date().toISOString();
-
-  // Find active primary bank account: prefer custom named or one with transactions
-  const allTxns = await db.transactions.toArray();
-  const bankAccounts = allAccounts.filter((a) => a.type === 'bank' && !a.is_archived);
-  
-  let primaryBank = bankAccounts.find((b) => allTxns.some((t) => t.account_id === b.id)) ||
-                    bankAccounts[0] ||
-                    allAccounts.find((a) => a.type !== 'savings' && !a.is_archived);
-
-  if (!primaryBank) {
-    primaryBank = {
+  // If no active accounts exist, create default Primary Bank
+  if (activeAccounts.length === 0) {
+    const now = new Date().toISOString();
+    await db.accounts.put({
       id: 'acc_bank_1',
       name: 'Primary Bank',
       type: 'bank',
@@ -203,90 +195,10 @@ export async function consolidateUserAccounts(): Promise<void> {
       is_archived: false,
       created_at: now,
       updated_at: now,
-    };
-    await db.accounts.put(primaryBank);
-  }
-
-  // Find savings account
-  let savingsAcc = allAccounts.find((a) => a.type === 'savings' && !a.is_archived);
-  if (!savingsAcc) {
-    savingsAcc = {
-      id: 'acc_savings_1',
-      name: 'Savings Reserve',
-      type: 'savings',
-      opening_balance_paise: 0,
-      current_balance_paise: 0,
-      currency: 'INR',
-      color: '#A8E66A',
-      institution_name: 'Savings Reserve',
-      is_archived: false,
-      created_at: now,
-      updated_at: now,
-    };
-    await db.accounts.put(savingsAcc);
-  }
-
-  // Active accounts map
-  const freshAccounts = await db.accounts.toArray();
-  const activeAccountIds = new Set(freshAccounts.filter((a) => !a.is_archived).map((a) => a.id));
-
-  // Comprehensive Transaction Reconciliation:
-  // Heal any orphaned, missing, legacy, or disconnected transaction IDs so funds always reflect in active balances!
-  for (const t of allTxns) {
-    let needsUpdate = false;
-    const updates: Partial<Transaction> = {};
-
-    if (!t.account_id || !activeAccountIds.has(t.account_id) || t.account_id !== primaryBank.id && t.account_id !== savingsAcc.id) {
-      // Re-route to Primary Bank
-      updates.account_id = primaryBank.id;
-      needsUpdate = true;
-    }
-
-    if (t.type === 'transfer') {
-      const currentSource = updates.account_id || t.account_id;
-      if (!t.to_account_id || !activeAccountIds.has(t.to_account_id) || t.to_account_id === currentSource) {
-        updates.to_account_id = currentSource === primaryBank.id ? savingsAcc.id : primaryBank.id;
-        needsUpdate = true;
-      }
-    }
-
-    if (needsUpdate) {
-      await db.transactions.update(t.id, updates);
-    }
-  }
-
-  // Re-link salary records
-  const allSalaries = await db.salary_records.toArray();
-  for (const s of allSalaries) {
-    if (!s.account_id || !activeAccountIds.has(s.account_id)) {
-      await db.salary_records.update(s.id, { account_id: primaryBank.id });
-    }
-  }
-
-  // Prevent double counting: If user added a salary income transaction for the month,
-  // ensure opening_balance_paise is not also holding the salary amount.
-  const primaryTxns = await db.transactions.where('account_id').equals(primaryBank.id).toArray();
-  const hasSalaryTxn = primaryTxns.some((t) => !t.is_deleted && t.type === 'income' && t.category_id === 'cat_inc_1');
-  if (hasSalaryTxn && primaryBank.opening_balance_paise > 0) {
-    await db.accounts.update(primaryBank.id, {
-      opening_balance_paise: 0,
-      updated_at: now,
     });
   }
 
-  // Archive any duplicate legacy accounts
-  const legacySpendingAccounts = freshAccounts.filter(
-    (a) => a.id !== primaryBank!.id && a.id !== savingsAcc!.id && a.type !== 'savings' && !a.is_archived
-  );
-  for (const legacy of legacySpendingAccounts) {
-    await db.accounts.update(legacy.id, { is_archived: true, updated_at: now });
-  }
-
-  // Recalculate and persist account balances
-  const updatedTxns = await db.transactions.toArray();
-  for (const acc of [primaryBank, savingsAcc]) {
-    const bal = AccountingEngine.calculateAccountBalance(acc, updatedTxns);
-    await db.accounts.update(acc.id, { current_balance_paise: bal, updated_at: now });
-  }
+  // Recalculate and sync balances across all active accounts
+  await AccountRepository.syncAccountBalances();
 }
 

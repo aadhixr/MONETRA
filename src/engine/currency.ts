@@ -24,8 +24,26 @@ export function toRupees(paise: number): number {
   return paise / 100;
 }
 
+let activeCurrencySymbol = '₹';
+
 /**
- * Formats integer paise into standard Indian Rupee notation with 2 decimal places (e.g. ₹1,45,250.00 or ₹250.50).
+ * Sets the active global currency symbol across the application (e.g. '$', '€', '£', 'د.إ', '₹').
+ */
+export function setGlobalCurrencySymbol(symbol: string): void {
+  if (symbol && typeof symbol === 'string') {
+    activeCurrencySymbol = symbol;
+  }
+}
+
+/**
+ * Returns the current active global currency symbol.
+ */
+export function getGlobalCurrencySymbol(): string {
+  return activeCurrencySymbol;
+}
+
+/**
+ * Formats integer paise/cents into standard currency notation with 2 decimal places (e.g. ₹1,45,250.00, $1,487.66, €250.50).
  */
 export function formatPaise(
   paise: number,
@@ -33,43 +51,54 @@ export function formatPaise(
     showDecimals?: boolean;
     showSign?: boolean;
     compact?: boolean;
+    symbol?: string;
   }
 ): string {
-  // Always show two decimal numbers by default (e.g. ₹18,000.00, ₹1,11,009.00, ₹0.00)
-  const { showDecimals = true, showSign = false, compact = false } = options || {};
+  const { showDecimals = true, showSign = false, compact = false, symbol = activeCurrencySymbol } = options || {};
+  const activeSymbol = symbol || activeCurrencySymbol || '₹';
   const isNegative = paise < 0;
   const absPaise = Math.abs(paise);
-  const rupees = absPaise / 100;
+  const units = absPaise / 100;
 
-  if (compact && absPaise >= 10000000) { // 1 Crore
-    const cr = (rupees / 10000000).toFixed(2);
-    return `${isNegative ? '-' : showSign ? '+' : ''}₹${cr} Cr`;
+  if (compact && absPaise >= 10000000 && activeSymbol === '₹') { // 1 Crore (INR)
+    const cr = (units / 10000000).toFixed(2);
+    return `${isNegative ? '-' : showSign ? '+' : ''}${activeSymbol}${cr} Cr`;
   }
-  if (compact && absPaise >= 100000) { // 1 Lakh
-    const lk = (rupees / 100000).toFixed(2);
-    return `${isNegative ? '-' : showSign ? '+' : ''}₹${lk} L`;
+  if (compact && absPaise >= 100000 && activeSymbol === '₹') { // 1 Lakh (INR)
+    const lk = (units / 100000).toFixed(2);
+    return `${isNegative ? '-' : showSign ? '+' : ''}${activeSymbol}${lk} L`;
+  }
+  if (compact && absPaise >= 1000000) { // 1 Million
+    const m = (units / 1000000).toFixed(2);
+    return `${isNegative ? '-' : showSign ? '+' : ''}${activeSymbol}${m}M`;
   }
   if (compact && absPaise >= 1000) { // 1k
-    const k = (rupees / 1000).toFixed(2);
-    return `${isNegative ? '-' : showSign ? '+' : ''}₹${k}k`;
+    const k = (units / 1000).toFixed(2);
+    return `${isNegative ? '-' : showSign ? '+' : ''}${activeSymbol}${k}k`;
   }
 
-  // Format using Indian Numbering System
-  const parts = rupees.toFixed(2).split('.');
+  // Format using Standard Numbering System
+  const parts = units.toFixed(2).split('.');
   let integerPart = parts[0];
   const decimalPart = parts[1];
 
-  // Indian comma separation: last 3 digits, then groups of 2 digits
-  let lastThree = integerPart.substring(integerPart.length - 3);
-  const otherNumbers = integerPart.substring(0, integerPart.length - 3);
-  if (otherNumbers !== '') {
-    lastThree = ',' + lastThree;
+  let formattedInt = integerPart;
+  if (activeSymbol === '₹') {
+    // Indian comma separation: last 3 digits, then groups of 2 digits
+    let lastThree = integerPart.substring(integerPart.length - 3);
+    const otherNumbers = integerPart.substring(0, integerPart.length - 3);
+    if (otherNumbers !== '') {
+      lastThree = ',' + lastThree;
+    }
+    formattedInt = otherNumbers.replace(/\B(?=(\d{2})+(?!\d))/g, ',') + lastThree;
+  } else {
+    // Standard Western comma separation (groups of 3)
+    formattedInt = integerPart.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
   }
-  const formattedInt = otherNumbers.replace(/\B(?=(\d{2})+(?!\d))/g, ',') + lastThree;
 
   const result = showDecimals !== false
-    ? `₹${formattedInt}.${decimalPart}`
-    : `₹${formattedInt}`;
+    ? `${activeSymbol}${formattedInt}.${decimalPart}`
+    : `${activeSymbol}${formattedInt}`;
 
   if (isNegative) return `-${result}`;
   if (showSign && paise > 0) return `+${result}`;

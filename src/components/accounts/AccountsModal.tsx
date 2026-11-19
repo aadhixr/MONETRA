@@ -1,7 +1,7 @@
 // AURIX - Multi-Account Management Modal
 // Clearly separates Primary (Spending) and Savings Accounts with 1-click Edit / Add Bank Name
 import React, { useState } from 'react';
-import { Plus, Wallet, Landmark, Smartphone, PiggyBank, ArrowRightLeft, Archive, Edit2, Check } from 'lucide-react';
+import { Plus, Wallet, Landmark, Smartphone, PiggyBank, ArrowRightLeft, Archive, Edit2, Check, Trash2 } from 'lucide-react';
 import { Modal } from '../common/Modal';
 import { Button } from '../common/Button';
 import { useFinancial } from '../../context/FinancialContext';
@@ -28,6 +28,8 @@ export const AccountsModal: React.FC<AccountsModalProps> = ({
     addAccount,
     updateAccount,
     archiveAccount,
+    deleteAccount,
+    refreshData,
     totalAvailableBalancePaise,
     totalSavingsBalancePaise,
   } = useFinancial();
@@ -37,8 +39,9 @@ export const AccountsModal: React.FC<AccountsModalProps> = ({
 
   // Form states
   const [name, setName] = useState('');
-  const [type, setType] = useState<AccountType>('bank');
-  const [openingBalanceStr, setOpeningBalanceStr] = useState('0');
+  const [selectedTypeCategory, setSelectedTypeCategory] = useState<string>('bank');
+  const [customCategoryInput, setCustomCategoryInput] = useState('');
+  const [openingBalanceStr, setOpeningBalanceStr] = useState('');
   const [institutionName, setInstitutionName] = useState('');
   const [accountNumberLast4, setAccountNumberLast4] = useState('');
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
@@ -46,58 +49,88 @@ export const AccountsModal: React.FC<AccountsModalProps> = ({
   const handleOpenAdd = () => {
     setEditingAccount(null);
     setName('');
-    setType('bank');
-    setOpeningBalanceStr('0');
+    setSelectedTypeCategory('bank');
+    setCustomCategoryInput('');
+    setOpeningBalanceStr('');
     setInstitutionName('');
     setAccountNumberLast4('');
+    setErrorMsg(null);
     setShowAddForm(true);
   };
 
   const handleOpenEdit = (acc: Account) => {
     setEditingAccount(acc);
     setName(acc.name);
-    setType(acc.type);
-    setOpeningBalanceStr(toRupees(acc.opening_balance_paise).toString());
+    const standardTypes = ['bank', 'cash', 'upi', 'savings'];
+    if (standardTypes.includes(acc.type)) {
+      setSelectedTypeCategory(acc.type);
+      setCustomCategoryInput('');
+    } else {
+      setSelectedTypeCategory('custom');
+      setCustomCategoryInput(acc.type || '');
+    }
+    setOpeningBalanceStr(acc.opening_balance_paise > 0 ? toRupees(acc.opening_balance_paise).toString() : '');
     setInstitutionName(acc.institution_name || '');
     setAccountNumberLast4(acc.account_number_last4 || '');
+    setErrorMsg(null);
     setShowAddForm(true);
+  };
+
+  const handleDeleteAccount = async (acc: Account) => {
+    if (confirm(`Are you sure you want to permanently delete account "${acc.name}"?`)) {
+      try {
+        await deleteAccount(acc.id);
+      } catch (err: any) {
+        alert(`Could not delete account: ${err.message}`);
+      }
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMsg(null);
 
-    if (!name.trim()) {
+    const trimmedName = name.trim();
+    if (!trimmedName) {
       setErrorMsg('Bank or account name is required');
       return;
     }
 
-    const openingPaise = toPaise(openingBalanceStr);
+    const openingPaise = openingBalanceStr.trim() ? toPaise(openingBalanceStr) : 0;
+    const finalTypeStr = (selectedTypeCategory === 'custom' ? customCategoryInput.trim() : selectedTypeCategory) || 'bank';
 
     try {
       if (editingAccount) {
         await updateAccount(editingAccount.id, {
-          name: name.trim(),
-          type,
+          name: trimmedName,
+          type: finalTypeStr as AccountType,
           opening_balance_paise: openingPaise,
           institution_name: institutionName.trim() || undefined,
           account_number_last4: accountNumberLast4.trim() || undefined,
         });
       } else {
         await addAccount({
-          name: name.trim(),
-          type,
+          name: trimmedName,
+          type: finalTypeStr as AccountType,
           opening_balance_paise: openingPaise,
           current_balance_paise: openingPaise,
           currency: 'INR',
-          color: type === 'savings' ? '#A8E66A' : '#E7FF32',
+          color: finalTypeStr.toLowerCase() === 'savings' ? '#A8E66A' : '#E7FF32',
           institution_name: institutionName.trim() || undefined,
           account_number_last4: accountNumberLast4.trim() || undefined,
           is_archived: false,
         });
       }
       setShowAddForm(false);
+      setName('');
+      setOpeningBalanceStr('');
+      setInstitutionName('');
+      setAccountNumberLast4('');
+      setCustomCategoryInput('');
+      setSelectedTypeCategory('bank');
+      setErrorMsg(null);
     } catch (err: any) {
+      console.error('Account Save Error:', err);
       setErrorMsg(err.message || 'Failed to save account');
     }
   };
@@ -176,47 +209,62 @@ export const AccountsModal: React.FC<AccountsModalProps> = ({
 
             <div>
               <label className="block text-xs font-semibold text-[#A1A69A] mb-1">
-                Account / Bank Name *
+                Account / Bank Name * (Required)
               </label>
               <input
                 type="text"
                 required
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                placeholder="e.g. HDFC Salary Bank, SBI Personal, ICICI Bank"
+                placeholder="e.g. HDFC Bank, SBI, Axis Bank, Paytm"
                 className="w-full bg-[#1C2019] border border-[#30352B] rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-[#E7FF32]"
               />
             </div>
 
             <div className="grid grid-cols-2 gap-2.5">
               <div>
-                <label className="block text-xs font-semibold text-[#A1A69A] mb-1">Account Category *</label>
+                <label className="block text-xs font-semibold text-[#A1A69A] mb-1">Account Category (Optional)</label>
                 <select
-                  value={type}
-                  onChange={(e) => setType(e.target.value as AccountType)}
+                  value={selectedTypeCategory}
+                  onChange={(e) => setSelectedTypeCategory(e.target.value)}
                   className="w-full bg-[#1C2019] border border-[#30352B] rounded-xl px-2.5 py-2.5 text-xs text-white focus:outline-none focus:border-[#E7FF32]"
                 >
                   <option value="bank">Primary Spending (Bank)</option>
                   <option value="cash">Cash Wallet (Spending)</option>
                   <option value="upi">UPI / Digital (Spending)</option>
                   <option value="savings">Dedicated Savings Account</option>
-                  <option value="custom">Custom Entity</option>
+                  <option value="custom">✨ Custom Category... (Type Below)</option>
                 </select>
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-[#A1A69A] mb-1">Opening Balance (₹) *</label>
+                <label className="block text-xs font-semibold text-[#A1A69A] mb-1">Opening Balance (₹) (Optional)</label>
                 <input
                   type="number"
                   step="any"
-                  required
                   value={openingBalanceStr}
                   onChange={(e) => setOpeningBalanceStr(e.target.value)}
-                  placeholder="0"
+                  placeholder="0.00"
                   className="w-full bg-[#1C2019] border border-[#30352B] rounded-xl px-3 py-2.5 text-xs font-bold text-[#E7FF32] focus:outline-none focus:border-[#E7FF32] num-tabular"
                 />
               </div>
             </div>
+
+            {selectedTypeCategory === 'custom' && (
+              <div className="animate-in fade-in duration-150">
+                <label className="block text-xs font-semibold text-[#E7FF32] mb-1">
+                  Custom Category Name * (e.g. Credit Card, Investment, Crypto, Fixed Deposit)
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={customCategoryInput}
+                  onChange={(e) => setCustomCategoryInput(e.target.value)}
+                  placeholder="e.g. Credit Card, Crypto Wallet, Investment"
+                  className="w-full bg-[#1C2019] border border-[#E7FF32]/60 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-[#E7FF32]"
+                />
+              </div>
+            )}
 
             <div className="grid grid-cols-2 gap-2.5">
               <div>
@@ -304,15 +352,13 @@ export const AccountsModal: React.FC<AccountsModalProps> = ({
                     <span>Rename</span>
                   </button>
 
-                  {spendingAccounts.length > 1 && (
-                    <button
-                      onClick={() => archiveAccount(acc.id)}
-                      className="p-1.5 text-[#A1A69A] hover:text-[#FF6868] transition-colors"
-                      title="Archive"
-                    >
-                      <Archive className="w-3.5 h-3.5" />
-                    </button>
-                  )}
+                  <button
+                    onClick={() => handleDeleteAccount(acc)}
+                    className="p-1.5 rounded-xl bg-[#151812] border border-[#30352B] hover:border-[#FF6868] text-[#A1A69A] hover:text-[#FF6868] transition-colors"
+                    title="Delete Account"
+                  >
+                    <Trash2 className="w-3.5 h-3.5" />
+                  </button>
                 </div>
               </div>
             );
@@ -337,7 +383,7 @@ export const AccountsModal: React.FC<AccountsModalProps> = ({
               <button
                 onClick={() => {
                   handleOpenAdd();
-                  setType('savings');
+                  setSelectedTypeCategory('savings');
                   setName('Dedicated Savings Reserve');
                 }}
                 className="text-[#A8E66A] font-bold hover:underline ml-1"
@@ -385,6 +431,14 @@ export const AccountsModal: React.FC<AccountsModalProps> = ({
                     >
                       <Edit2 className="w-3 h-3" />
                       <span>Rename</span>
+                    </button>
+
+                    <button
+                      onClick={() => handleDeleteAccount(acc)}
+                      className="p-1.5 rounded-xl bg-[#151812] border border-[#30352B] hover:border-[#FF6868] text-[#A1A69A] hover:text-[#FF6868] transition-colors"
+                      title="Delete Account"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
                     </button>
                   </div>
                 </div>

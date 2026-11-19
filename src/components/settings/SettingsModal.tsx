@@ -1,12 +1,12 @@
-// AURIX - Settings, Privacy & Cloud Vault Management
+// AURIX - Settings & Data Management
 import React, { useState } from 'react';
-import { Settings, User, Cloud, Database, Download, Upload, Shield, Trash2, CheckCircle2, Palette, Check, Smartphone, RefreshCw, ExternalLink, Info } from 'lucide-react';
+import { Settings, User, Database, Download, Upload, Shield, Trash2, CheckCircle2, Palette, Check, Smartphone, RefreshCw, ExternalLink, Info, Globe, ShieldAlert } from 'lucide-react';
 import { Modal } from '../common/Modal';
 import { Button } from '../common/Button';
 import { useFinancial } from '../../context/FinancialContext';
 import { SettingsRepository } from '../../db/repositories/settingsRepository';
-import { SyncService } from '../../services/syncService';
 import { THEMES, normalizeThemeId } from '../../engine/themes';
+import { SUPPORTED_CURRENCIES, CurrencyService } from '../../services/currencyService';
 import type { ThemeId } from '../../types';
 
 interface SettingsModalProps {
@@ -16,15 +16,12 @@ interface SettingsModalProps {
 }
 
 export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose }) => {
-  const { settings, updateSettings, refreshData } = useFinancial();
+  const { settings, updateSettings, refreshData, openAdminPortal } = useFinancial();
 
   const [userName, setUserName] = useState(settings?.user_name || 'Alex');
-  const [cloudEnabled, setCloudEnabled] = useState(settings?.cloud_backup_enabled || false);
-  const [cloudUrl, setCloudUrl] = useState(settings?.cloud_url || '');
-  const [cloudAnonKey, setCloudAnonKey] = useState(settings?.cloud_anon_key || '');
-
+  const [selectedCurrency, setSelectedCurrency] = useState(settings?.currency_code || 'INR');
+  const [isConvertingCurrency, setIsConvertingCurrency] = useState(false);
   const [syncStatusMsg, setSyncStatusMsg] = useState<string | null>(null);
-  const [isSyncing, setIsSyncing] = useState(false);
 
   // Wireless OTA Update State
   const [isCheckingUpdate, setIsCheckingUpdate] = useState(false);
@@ -45,77 +42,44 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
     setTimeout(() => setSyncStatusMsg(null), 2500);
   };
 
+  const handleCurrencyChange = async (newCode: string) => {
+    if (newCode === selectedCurrency || isConvertingCurrency) return;
+
+    const oldCurrInfo = SUPPORTED_CURRENCIES.find((c) => c.code === selectedCurrency) || SUPPORTED_CURRENCIES[0];
+    const newCurrInfo = SUPPORTED_CURRENCIES.find((c) => c.code === newCode) || SUPPORTED_CURRENCIES[0];
+
+    const confirmMsg = `Auto-convert all accounts, transactions, budgets, and savings from ${oldCurrInfo.flag} ${oldCurrInfo.code} (${oldCurrInfo.symbol}) to ${newCurrInfo.flag} ${newCurrInfo.code} (${newCurrInfo.symbol}) using live exchange rates?`;
+    if (!confirm(confirmMsg)) return;
+
+    setIsConvertingCurrency(true);
+    setSyncStatusMsg(`Fetching live exchange rates & converting database to ${newCurrInfo.code}...`);
+
+    try {
+      const { multiplier, success } = await CurrencyService.convertEntireDatabaseCurrency(selectedCurrency, newCode);
+      if (success) {
+        await updateSettings({
+          currency_code: newCurrInfo.code,
+          currency_symbol: newCurrInfo.symbol,
+          locale: newCurrInfo.locale,
+        });
+        setSelectedCurrency(newCurrInfo.code);
+        await refreshData();
+        setSyncStatusMsg(`✅ Database converted to ${newCurrInfo.flag} ${newCurrInfo.code}! Rate: 1 ${oldCurrInfo.code} = ${multiplier.toFixed(4)} ${newCurrInfo.code}`);
+      }
+    } catch (err: any) {
+      setSyncStatusMsg(`Currency conversion error: ${err.message}`);
+    } finally {
+      setIsConvertingCurrency(false);
+    }
+  };
+
   const handleSaveProfile = async (e: React.FormEvent) => {
     e.preventDefault();
     await updateSettings({
       user_name: userName.trim() || 'Alex',
-      cloud_backup_enabled: cloudEnabled,
-      cloud_url: cloudUrl.trim() || undefined,
-      cloud_anon_key: cloudAnonKey.trim() || undefined,
     });
     setSyncStatusMsg('Settings saved successfully!');
     setTimeout(() => setSyncStatusMsg(null), 3000);
-  };
-
-  const handleTestSupabaseConnection = async () => {
-    setIsSyncing(true);
-    setSyncStatusMsg(null);
-    try {
-      const result = await SyncService.testConnection(cloudUrl, cloudAnonKey);
-      setSyncStatusMsg(result.message);
-    } catch (err: any) {
-      setSyncStatusMsg(`Connection test failed: ${err.message}`);
-    } finally {
-      setIsSyncing(false);
-    }
-  };
-
-  const handleCloudBackupNow = async () => {
-    setIsSyncing(true);
-    setSyncStatusMsg(null);
-    try {
-      const url = cloudUrl.trim();
-      const key = cloudAnonKey.trim();
-      if (!url || !key) {
-        throw new Error('Please enter both Supabase Project URL and Anon Key.');
-      }
-      await updateSettings({
-        cloud_backup_enabled: true,
-        cloud_url: url,
-        cloud_anon_key: key,
-      });
-      await SyncService.backupToCloud('monetra_local_key', url, key);
-      setSyncStatusMsg('Encrypted vault successfully backed up to cloud!');
-    } catch (err: any) {
-      setSyncStatusMsg(`Backup failed: ${err.message}`);
-    } finally {
-      setIsSyncing(false);
-    }
-  };
-
-  const handleCloudRestoreNow = async () => {
-    if (!confirm('Restoring will merge/overwrite local data with cloud vault. Continue?')) return;
-    setIsSyncing(true);
-    setSyncStatusMsg(null);
-    try {
-      const url = cloudUrl.trim();
-      const key = cloudAnonKey.trim();
-      if (!url || !key) {
-        throw new Error('Please enter both Supabase Project URL and Anon Key.');
-      }
-      await updateSettings({
-        cloud_backup_enabled: true,
-        cloud_url: url,
-        cloud_anon_key: key,
-      });
-      await SyncService.restoreFromCloud('monetra_local_key', url, key);
-      await refreshData();
-      setSyncStatusMsg('Restored successfully from cloud!');
-    } catch (err: any) {
-      setSyncStatusMsg(`Restore failed: ${err.message}`);
-    } finally {
-      setIsSyncing(false);
-    }
   };
 
   const handleExportJSON = async () => {
@@ -259,7 +223,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
             <img
               src="/logo.jpg"
               alt="AURIX Icon"
-              className="w-13 h-13 rounded-2xl shadow-xl border border-[#30352B] object-cover ring-2 ring-[#D4AF37]/30"
+              className="w-12 h-12 rounded-2xl shadow-lg border border-[#30352B] object-cover shrink-0 bg-black"
             />
             <div>
               <div className="flex items-center gap-2">
@@ -268,26 +232,6 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
               </div>
               <p className="text-xs text-[#A1A69A] mt-0.5">Institutional Wealth & Precision Ledger</p>
             </div>
-          </div>
-          <div className="hidden sm:flex items-center gap-2">
-            <img
-              src="/monetra-classic-gold.jpg"
-              alt="Classic Gold Professional"
-              title="Classic Professional Gold Monogram"
-              className="w-10 h-10 rounded-xl border border-[#D4AF37]/80 object-cover ring-1 ring-[#D4AF37]/50"
-            />
-            <img
-              src="/monetra-shield-m.jpg"
-              alt="Growth Shield M"
-              title="Modern: Growth Shield M Monogram"
-              className="w-9 h-9 rounded-xl border border-[#30352B] object-cover opacity-80 hover:opacity-100 transition-opacity"
-            />
-            <img
-              src="/monetra-logo-v2.jpg"
-              alt="Infinite Ribbon Variant"
-              title="Modern: Infinite Ribbon Monogram"
-              className="w-9 h-9 rounded-xl border border-[#30352B] object-cover opacity-70 hover:opacity-100 transition-opacity"
-            />
           </div>
         </div>
 
@@ -321,6 +265,41 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
             Save Profile
           </Button>
         </form>
+
+        {/* Global Currency & Live Auto-Conversion */}
+        <div className="p-4 bg-[#1C2019] border border-[#30352B] rounded-2xl space-y-3">
+          <div className="flex items-center justify-between pb-2 border-b border-[#30352B]">
+            <div className="flex items-center space-x-2">
+              <Globe className="w-4 h-4 text-[#38BDF8]" />
+              <span className="text-xs font-bold text-white uppercase tracking-wider">
+                Primary Currency & Live Auto-Conversion
+              </span>
+            </div>
+            <span className="text-[10px] font-mono text-[#38BDF8] bg-[#38BDF8]/10 border border-[#38BDF8]/30 px-2 py-0.5 rounded-full">
+              Live Rates
+            </span>
+          </div>
+
+          <p className="text-[11px] text-[#A1A69A]">
+            Changing primary currency fetches live exchange rates and automatically converts all accounts, transactions, and budgets seamlessly.
+          </p>
+
+          <div>
+            <label className="block text-xs font-semibold text-[#A1A69A] mb-1">Select Primary Currency</label>
+            <select
+              value={selectedCurrency}
+              onChange={(e) => handleCurrencyChange(e.target.value)}
+              disabled={isConvertingCurrency}
+              className="w-full bg-[#151812] border border-[#30352B] focus:border-[#38BDF8] rounded-xl px-3 py-2 text-xs text-white font-semibold cursor-pointer"
+            >
+              {SUPPORTED_CURRENCIES.map((c) => (
+                <option key={c.code} value={c.code}>
+                  {c.flag} {c.code} ({c.symbol}) — {c.name}
+                </option>
+              ))}
+            </select>
+          </div>
+        </div>
 
         {/* Theme Options Section in Profile */}
         <div className="p-4 bg-[#1C2019] border border-[#30352B] rounded-2xl space-y-3">
@@ -396,91 +375,6 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
           </div>
         </div>
 
-        {/* Optional Cloud Backup (Supabase) */}
-        <div className="p-4 bg-[#1C2019] border border-[#30352B] rounded-2xl space-y-3">
-          <div className="flex items-center justify-between pb-2 border-b border-[#30352B]">
-            <div className="flex items-center space-x-2">
-              <Cloud className="w-4 h-4 text-[#38BDF8]" />
-              <span className="text-xs font-bold text-white uppercase tracking-wider">
-                Optional Cloud Sync
-              </span>
-            </div>
-            <label className="relative inline-flex items-center cursor-pointer">
-              <input
-                type="checkbox"
-                checked={cloudEnabled}
-                onChange={(e) => setCloudEnabled(e.target.checked)}
-                className="sr-only peer"
-              />
-              <div className="w-9 h-5 bg-[#30352B] peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-[#E7FF32]"></div>
-            </label>
-          </div>
-
-          <p className="text-[11px] text-[#A1A69A]">
-            Disabled by default. When enabled, your local IndexedDB ledger is encrypted client-side with AES-GCM before saving to your personal Supabase instance.
-          </p>
-
-          {cloudEnabled && (
-            <div className="space-y-2 pt-1">
-              <div>
-                <label className="block text-[11px] text-[#A1A69A] mb-1">Supabase Project URL</label>
-                <input
-                  type="text"
-                  value={cloudUrl}
-                  onChange={(e) => setCloudUrl(e.target.value)}
-                  placeholder="https://xyzcompany.supabase.co"
-                  className="w-full bg-[#151812] border border-[#30352B] rounded-xl px-3 py-2 text-xs text-white"
-                />
-              </div>
-              <div>
-                <label className="block text-[11px] text-[#A1A69A] mb-1">Supabase Anon Key</label>
-                <input
-                  type="password"
-                  value={cloudAnonKey}
-                  onChange={(e) => setCloudAnonKey(e.target.value)}
-                  placeholder="eyJhbGciOiJIUzI1NiIsIn..."
-                  className="w-full bg-[#151812] border border-[#30352B] rounded-xl px-3 py-2 text-xs text-white"
-                />
-              </div>
-
-              <div className="grid grid-cols-3 gap-2 pt-1">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={handleTestSupabaseConnection}
-                  disabled={isSyncing || !cloudUrl || !cloudAnonKey}
-                >
-                  Test Connection
-                </Button>
-                <Button
-                  variant="primary"
-                  size="sm"
-                  onClick={handleCloudBackupNow}
-                  disabled={isSyncing || !cloudUrl || !cloudAnonKey}
-                >
-                  Backup Now
-                </Button>
-                <Button
-                  variant="secondary"
-                  size="sm"
-                  onClick={handleCloudRestoreNow}
-                  disabled={isSyncing || !cloudUrl || !cloudAnonKey}
-                >
-                  Restore
-                </Button>
-              </div>
-
-              <div className="p-2.5 bg-[#151812] border border-[#30352B] rounded-xl text-[10px] text-[#A1A69A]">
-                <div className="font-bold text-white mb-1">Required Supabase Setup SQL (Run Both Lines):</div>
-                <code className="block bg-[#090B08] p-2 rounded text-[#A8E66A] font-mono select-all overflow-x-auto whitespace-pre-wrap leading-relaxed">
-                  CREATE TABLE IF NOT EXISTS monetra_backups (user_id text primary key, payload text, updated_at text);{"\n"}
-                  ALTER TABLE monetra_backups DISABLE ROW LEVEL SECURITY;
-                </code>
-              </div>
-            </div>
-          )}
-        </div>
-
         {/* Local Storage & Export / Import */}
         <div className="p-4 bg-[#1C2019] border border-[#30352B] rounded-2xl space-y-3">
           <div className="flex items-center space-x-2 pb-2 border-b border-[#30352B]">
@@ -526,9 +420,6 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
                 Application Info & Wireless Updates
               </span>
             </div>
-            <span className="text-[10px] font-mono text-[#A8E66A] bg-[#A8E66A]/10 border border-[#A8E66A]/30 px-2 py-0.5 rounded-full">
-              OTA Ready
-            </span>
           </div>
 
           <div className="grid grid-cols-3 gap-2 text-center py-1">
@@ -547,7 +438,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
           </div>
 
           {/* Wireless Update Action Button */}
-          <div className="pt-1">
+          <div className="pt-1 space-y-2">
             <button
               type="button"
               onClick={handleCheckForUpdates}
@@ -557,6 +448,21 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
               <RefreshCw className={`w-3.5 h-3.5 ${isCheckingUpdate ? 'animate-spin' : ''}`} />
               <span>{isCheckingUpdate ? 'Checking GitHub Releases...' : 'Check Wireless Update'}</span>
             </button>
+
+            {/* Owner Admin License Key Portal Access (Visible only in Admin Mode) */}
+            {typeof localStorage !== 'undefined' && localStorage.getItem('aurix_admin_authenticated') === 'true' && (
+              <button
+                type="button"
+                onClick={() => {
+                  onClose();
+                  openAdminPortal();
+                }}
+                className="w-full py-2 px-3 rounded-xl bg-[#1C2019] hover:bg-[#23281F] border border-[#30352B] hover:border-[#E7FF32] text-xs font-bold text-[#A1A69A] hover:text-[#E7FF32] flex items-center justify-center space-x-2 transition-colors cursor-pointer"
+              >
+                <ShieldAlert className="w-3.5 h-3.5 text-[#E7FF32]" />
+                <span>Owner Admin License Portal</span>
+              </button>
+            )}
           </div>
 
           {/* Update Status Banner & Download Button */}
@@ -594,6 +500,20 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
             {syncStatusMsg}
           </div>
         )}
+
+        {/* Developer Credit Footer */}
+        <div className="pt-3 text-center border-t border-[#30352B]/60 flex items-center justify-center space-x-1.5 text-xs text-[#A1A69A]">
+          <span>Developed by</span>
+          <a
+            href="https://github.com/Aadhi000"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="font-bold text-sm text-[#E7FF32] tracking-wider font-mono hover:text-white transition-colors cursor-pointer inline-flex items-center space-x-1"
+          >
+            <span>ααdhí</span>
+            <ExternalLink className="w-3 h-3 text-[#D4AF37] ml-0.5" />
+          </a>
+        </div>
       </div>
     </Modal>
   );

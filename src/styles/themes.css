@@ -329,6 +329,84 @@
 [data-theme="slate_minimal"] .via-\[\#151812\] { --tw-gradient-via: #111317 var(--tw-gradient-via-position) !important; }
 [data-theme="slate_minimal"] .to-\[\#1C2019\] { --tw-gradient-to: #191C22 var(--tw-gradient-to-position) !important; }
 
+/* 8. Ferrari Crimson */
+[data-theme="ferrari_crimson"] body,
+[data-theme="ferrari_crimson"] .bg-\[\#090B08\],
+[data-theme="ferrari_crimson"] .bg-\[\#090B08\]\/95 { background-color: #0B0404 !important; }
+[data-theme="ferrari_crimson"] .bg-\[\#151812\] { background-color: #180808 !important; }
+[data-theme="ferrari_crimson"] .bg-\[\#1C2019\] { background-color: #260D0D !important; }
+[data-theme="ferrari_crimson"] .bg-\[\#23281F\] { background-color: #381313 !important; }
+[data-theme="ferrari_crimson"] .border-\[\#30352B\] { border-color: #4D1D1D !important; }
+[data-theme="ferrari_crimson"] .text-\[\#E7FF32\] { color: #EF4444 !important; }
+[data-theme="ferrari_crimson"] .bg-\[\#E7FF32\] { background-color: #EF4444 !important; }
+[data-theme="ferrari_crimson"] .border-\[\#E7FF32\] { border-color: #EF4444 !important; }
+[data-theme="ferrari_crimson"] .text-\[\#A1A69A\] { color: #C59A9A !important; }
+
+/* 9. Velvet Rose */
+[data-theme="velvet_rose"] body,
+[data-theme="velvet_rose"] .bg-\[\#090B08\],
+[data-theme="velvet_rose"] .bg-\[\#090B08\]\/95 { background-color: #0D0409 !important; }
+[data-theme="velvet_rose"] .bg-\[\#151812\] { background-color: #1A0812 !important; }
+[data-theme="velvet_rose"] .bg-\[\#1C2019\] { background-color: #290D1D !important; }
+[data-theme="velvet_rose"] .bg-\[\#23281F\] { background-color: #3B132B !important; }
+[data-theme="velvet_rose"] .border-\[\#30352B\] { border-color: #541D3F !important; }
+[data-theme="velvet_rose"] .text-\[\#E7FF32\] { color: #EC4899 !important; }
+[data-theme="velvet_rose"] .bg-\[\#E7FF32\] { background-color: #EC4899 !important; }
+[data-theme="velvet_rose"] .border-\[\#E7FF32\] { border-color: #EC4899 !important; }
+[data-theme="velvet_rose"] .text-\[\#A1A69A\] { color: #C79BB6 !important; }
+
+/* 10. Royal Sapphire */
+[data-theme="royal_sapphire"] body,
+[data-theme="royal_sapphire"] .bg-\[\#090B08\],
+[data-theme="royal_sapphire"] .bg-\[\#090B08\]\/95 { background-color: #04050E !important; }
+[data-theme="royal_sapphire"] .bg-\[\#151812\] { background-color: #090B1B !important; }
+[data-theme="royal_sapphire"] .bg-\[\#1C2019\] { background-color: #0E112B !important; }
+[data-theme="royal_sapphire"] .bg-\[\#23281F\] { background-color: #151A3E !important; }
+[data-theme="royal_sapphire"] .border-\[\#30352B\] { border-color: #212759 !important; }
+[data-theme="royal_sapphire"] .text-\[\#E7FF32\] { color: #6366F1 !important; }
+[data-theme="royal_sapphire"] .bg-\[\#E7FF32\] { background-color: #6366F1 !important; }
+[data-theme="royal_sapphire"] .border-\[\#E7FF32\] { border-color: #6366F1 !important; }
+[data-theme="royal_sapphire"] .text-\[\#A1A69A\] { color: #9B9FC5 !important; }
+
+/* 11. Aquamarine Teal */
+[data-theme="aquamarine_ocean"] body,
+[data-theme="aquamarine_ocean"] .bg-\[\#090B08\],
+[data-theme="aquamarine_ocean"] .bg-\[\#090B08\]\/95 { background-color: #020C0E !important; }
+[data-theme="aquamarine_ocean"] .bg-\[\#151812\] { background-color: #05181C !important; }
+[data-theme="aquamarine_ocean"] .bg-\[\#1C2019\] { background-color: #09262C !important; }
+[data-theme="aquamarine_ocean"] .bg-\[\#23281F\] { background-color: #0E3841 !important; }
+[data-theme="aquamarine_ocean"] .border-\[\#30352B\] { border-color: #16505C !important; }
+[data-theme="aquamarine_ocean"] .text-\[\#E7FF32\] { color: #06B6D4 !important; }
+[data-theme="aquamarine_ocean"] .bg-\[\#E7FF32\] { background-color: #06B6D4 !important; }
+[data-theme="aquamarine_ocean"] .border-\[\#E7FF32\] { border-color: #06B6D4 !important; }
+[data-theme="aquamarine_ocean"] .text-\[\#A1A69A\] { color: #8CB8C2 !important; }
+
+/* 12. Platinum Titanium */
+[data-theme="platinum_silver"] body,
+[data-theme="platinum_silver"] .bg-\[\#090B08\],
+[data-theme="platinum_silver"] .bg-\[\#090B08\]\/95 { background-color: #060709 !important; }
+[data-theme="platinum_silver"] .bg-\[\#151812\] { background-color: #0E1116 !important; }
+[data-theme="platinum_silver"] .bg-\[\#1C2019\] { background-color: #161B22 !important; }
+[data-theme="platinum_silver"] .bg-\[\#23281F\] { background-color: #212631 !important; }
+[data-theme="platinum_silver"] .border-\[\#30352B\] { border-color: #303644 !important; }
+[data-theme="platinum_silver"] .text-\[\#E7FF32\] { color: #38BDF8 !important; }
+[data-theme="platinum_silver"] .bg-\[\#E7FF32\] { background-color: #38BDF8 !important; }
+[data-theme="platinum_silver"] .border-\[\#E7FF32\] { border-color: #38BDF8 !important; }
+[data-theme="platinum_silver"] .text-\[\#A1A69A\] { color: #94A3B8 !important; }
+
+/* 13. Deep Cosmos */
+[data-theme="deep_cosmos"] body,
+[data-theme="deep_cosmos"] .bg-\[\#090B08\],
+[data-theme="deep_cosmos"] .bg-\[\#090B08\]\/95 { background-color: #090805 !important; }
+[data-theme="deep_cosmos"] .bg-\[\#151812\] { background-color: #131109 !important; }
+[data-theme="deep_cosmos"] .bg-\[\#1C2019\] { background-color: #1D190E !important; }
+[data-theme="deep_cosmos"] .bg-\[\#23281F\] { background-color: #2A2414 !important; }
+[data-theme="deep_cosmos"] .border-\[\#30352B\] { border-color: #42391F !important; }
+[data-theme="deep_cosmos"] .text-\[\#E7FF32\] { color: #FBBF24 !important; }
+[data-theme="deep_cosmos"] .bg-\[\#E7FF32\] { background-color: #FBBF24 !important; }
+[data-theme="deep_cosmos"] .border-\[\#E7FF32\] { border-color: #FBBF24 !important; }
+[data-theme="deep_cosmos"] .text-\[\#A1A69A\] { color: #C2B89A !important; }
+
 /* Dynamic Glows, Selections and Scrollbars */
 [data-theme] .neon-glow {
   box-shadow: 0 0 16px var(--theme-glow, rgba(231, 255, 50, 0.22)) !important;

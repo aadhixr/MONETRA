@@ -1,8 +1,8 @@
 // AURIX - Fixed Mobile Bottom Navigation Bar
 import React from 'react';
-import { Home, PieChart, PiggyBank, Sparkles, Plus } from 'lucide-react';
+import { Home, PieChart, PiggyBank, Sparkles, Plus, ShieldAlert } from 'lucide-react';
 
-export type TabType = 'home' | 'budget' | 'savings' | 'insights';
+export type TabType = 'home' | 'budget' | 'savings' | 'insights' | 'admin';
 
 interface BottomNavProps {
   currentTab: TabType;
@@ -15,11 +15,14 @@ export const BottomNav: React.FC<BottomNavProps> = ({
   onTabChange,
   onQuickAdd,
 }) => {
+  const isAdminMode = typeof localStorage !== 'undefined' && localStorage.getItem('aurix_admin_authenticated') === 'true';
+
   const tabs = [
     { id: 'home' as TabType, label: 'HOME', icon: Home },
     { id: 'budget' as TabType, label: 'BUDGET', icon: PieChart },
     { id: 'savings' as TabType, label: 'SAVINGS', icon: PiggyBank },
     { id: 'insights' as TabType, label: 'INSIGHTS', icon: Sparkles },
+    ...(isAdminMode ? [{ id: 'admin' as TabType, label: 'ADMIN', icon: ShieldAlert }] : []),
   ];
 
   return (
@@ -64,9 +67,9 @@ export const BottomNav: React.FC<BottomNavProps> = ({
           </button>
         </div>
 
-        {/* Right two tabs: SAVINGS, INSIGHTS */}
-        <div className="flex items-center space-x-6">
-          {tabs.slice(2, 4).map((tab) => {
+        {/* Right tabs: SAVINGS, INSIGHTS, ADMIN */}
+        <div className="flex items-center space-x-3 sm:space-x-4">
+          {tabs.slice(2, 5).map((tab) => {
             const Icon = tab.icon;
             const isActive = currentTab === tab.id;
             return (

@@ -595,48 +595,60 @@ export const SavingsScreen: React.FC = () => {
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           {/* Primary Account */}
-          <div className="p-3 bg-[#1C2019] border border-[#30352B] rounded-xl flex items-center justify-between">
-            <div className="flex items-center space-x-2.5">
-              <div className="w-8 h-8 rounded-lg bg-[#E7FF32]/10 text-[#E7FF32] flex items-center justify-center">
-                <Landmark className="w-4 h-4" />
-              </div>
-              <div>
-                <div className="text-xs font-bold text-white flex items-center space-x-1">
-                  <span>{spendingAccounts[0]?.name || 'Primary Bank'}</span>
-                  <span className="text-[9px] uppercase px-1 rounded bg-[#23281F] text-[#E7FF32]">Spending</span>
+          {(() => {
+            const primarySpendingAcc = accounts.find((a) => a.type === 'bank' && !a.is_archived) || spendingAccounts[0];
+            const primarySpendingBal = primarySpendingAcc ? AccountingEngine.calculateAccountBalance(primarySpendingAcc, transactions) : 0;
+            return (
+              <div className="p-3 bg-[#1C2019] border border-[#30352B] rounded-xl flex items-center justify-between">
+                <div className="flex items-center space-x-2.5">
+                  <div className="w-8 h-8 rounded-lg bg-[#E7FF32]/10 text-[#E7FF32] flex items-center justify-center">
+                    <Landmark className="w-4 h-4" />
+                  </div>
+                  <div>
+                    <div className="text-xs font-bold text-white flex items-center space-x-1">
+                      <span>{primarySpendingAcc?.name || 'Primary Bank'}</span>
+                      <span className="text-[9px] uppercase px-1 rounded bg-[#23281F] text-[#E7FF32]">Spending</span>
+                    </div>
+                    <div className="text-[11px] text-[#A1A69A]">Daily spending & debits</div>
+                  </div>
                 </div>
-                <div className="text-[11px] text-[#A1A69A]">Daily spending & debits</div>
+                <div className="text-right">
+                  <div className="text-xs font-bold text-[#E7FF32] num-tabular">
+                    {formatPaise(primarySpendingBal)}
+                  </div>
+                  <div className="text-[10px] text-[#A1A69A]">Available</div>
+                </div>
               </div>
-            </div>
-            <div className="text-right">
-              <div className="text-xs font-bold text-[#E7FF32] num-tabular">
-                {formatPaise(totalAvailableBalancePaise)}
-              </div>
-              <div className="text-[10px] text-[#A1A69A]">Available</div>
-            </div>
-          </div>
+            );
+          })()}
 
           {/* Savings Account */}
-          <div className="p-3 bg-[#1C2019] border border-[#30352B] rounded-xl flex items-center justify-between">
-            <div className="flex items-center space-x-2.5">
-              <div className="w-8 h-8 rounded-lg bg-[#A8E66A]/10 text-[#A8E66A] flex items-center justify-center">
-                <PiggyBank className="w-4 h-4" />
-              </div>
-              <div>
-                <div className="text-xs font-bold text-white flex items-center space-x-1">
-                  <span>{savingsAccounts[0]?.name || 'Savings Reserve'}</span>
-                  <span className="text-[9px] uppercase px-1 rounded bg-[#23281F] text-[#A8E66A]">Reserve</span>
+          {(() => {
+            const primarySavingsAcc = savingsAccounts[0] || accounts.find((a) => a.type === 'savings' && !a.is_archived);
+            const primarySavingsBal = primarySavingsAcc ? AccountingEngine.calculateAccountBalance(primarySavingsAcc, transactions) : totalSavingsBalancePaise;
+            return (
+              <div className="p-3 bg-[#1C2019] border border-[#30352B] rounded-xl flex items-center justify-between">
+                <div className="flex items-center space-x-2.5">
+                  <div className="w-8 h-8 rounded-lg bg-[#A8E66A]/10 text-[#A8E66A] flex items-center justify-center">
+                    <PiggyBank className="w-4 h-4" />
+                  </div>
+                  <div>
+                    <div className="text-xs font-bold text-white flex items-center space-x-1">
+                      <span>{primarySavingsAcc?.name || 'Savings Reserve'}</span>
+                      <span className="text-[9px] uppercase px-1 rounded bg-[#23281F] text-[#A8E66A]">Reserve</span>
+                    </div>
+                    <div className="text-[11px] text-[#A1A69A]">Untouched isolated reserve</div>
+                  </div>
                 </div>
-                <div className="text-[11px] text-[#A1A69A]">Untouched isolated reserve</div>
+                <div className="text-right">
+                  <div className="text-xs font-bold text-[#A8E66A] num-tabular">
+                    {formatPaise(primarySavingsBal)}
+                  </div>
+                  <div className="text-[10px] text-[#A1A69A]">In Savings</div>
+                </div>
               </div>
-            </div>
-            <div className="text-right">
-              <div className="text-xs font-bold text-[#A8E66A] num-tabular">
-                {formatPaise(savingsBalancePaise)}
-              </div>
-              <div className="text-[10px] text-[#A1A69A]">In Savings</div>
-            </div>
-          </div>
+            );
+          })()}
         </div>
       </div>
 

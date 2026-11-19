@@ -57,6 +57,19 @@ export const AccountRepository = {
     });
   },
 
+  async delete(id: string): Promise<void> {
+    await db.accounts.delete(id);
+    const now = new Date().toISOString();
+    await db.audit_events.put({
+      id: `audit_${Date.now()}`,
+      action: 'delete',
+      entity: 'account',
+      entity_id: id,
+      details: `Deleted account ${id}`,
+      timestamp: now,
+    });
+  },
+
   /**
    * Recalculates and persists current balance across all accounts using ledger transactions.
    */

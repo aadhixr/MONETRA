@@ -1,4 +1,4 @@
-name: Build & Publish Android Release
+name: Build & Publish Cross-Platform Release (Android & iOS)
 
 on:
   push:
@@ -9,8 +9,8 @@ on:
   workflow_dispatch:
 
 jobs:
-  build-and-release:
-    name: Build Signed Android APK & Publish Release
+  build-android:
+    name: Build Signed Android APK
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -69,35 +69,102 @@ jobs:
           cd android
           ./gradlew assembleRelease --no-daemon -PversionCode=${{ github.run_number }} -PversionName="1.0.${{ github.run_number }}"
 
-      - name: Prepare Release APK Artifact
+      - name: Prepare Apps Android Output Folder
         run: |
-          mkdir -p release-apk
-          cp android/app/build/outputs/apk/release/app-release.apk release-apk/AURIX-v1.0.${{ github.run_number }}-release.apk
-          cp android/app/build/outputs/apk/release/app-release.apk release-apk/AURIX-latest-release.apk
+          mkdir -p apps/android
+          cp android/app/build/outputs/apk/release/app-release.apk apps/android/AURIX-PRO-android-release.apk
+          cp android/app/build/outputs/apk/release/app-release.apk apps/android/app-release.apk
 
-      - name: Upload Build Artifact to GitHub Actions
+      - name: Upload Android Release Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: AURIX-release-apk-b${{ github.run_number }}
-          path: release-apk/*.apk
+          name: AURIX-android-signed-b${{ github.run_number }}
+          path: apps/android/*.apk
 
-      - name: Create or Update GitHub Release
+  build-ios:
+    name: Build Native iOS iPhone Bundle
+    runs-on: macos-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'npm'
+
+      - name: Install NPM dependencies
+        run: npm ci || npm install
+
+      - name: Build Web Application
+        run: npm run build
+
+      - name: Sync Capacitor iOS
+        run: npx cap sync ios
+
+      - name: Prepare Apps iPhone Output Folder
+        run: |
+          mkdir -p apps/iphone
+          cp -R ios/App/App/public apps/iphone/public
+          cp -R ios/App/App.xcodeproj apps/iphone/App.xcodeproj
+          cp ios/App/App/capacitor.config.json apps/iphone/capacitor.config.json
+          cd apps/iphone && zip -r ../../AURIX-PRO-ios-bundle.zip . && cd ../..
+
+      - name: Upload iPhone iOS Release Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: AURIX-iphone-ios-b${{ github.run_number }}
+          path: AURIX-PRO-ios-bundle.zip
+
+  publish-release:
+    name: Publish Cross-Platform GitHub Release
+    needs: [build-android, build-ios]
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/')
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Download Android Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: AURIX-android-signed-b${{ github.run_number }}
+          path: apps/android
+
+      - name: Download iOS Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: AURIX-iphone-ios-b${{ github.run_number }}
+          path: apps/iphone
+
+      - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
-        if: startsWith(github.ref, 'refs/tags/')
         with:
           tag_name: ${{ github.ref_name }}
-          name: AURIX PRO Release ${{ github.ref_name }}
+          name: AURIX PRO Cross-Platform Release ${{ github.ref_name }}
           body: |
-            ## 🚀 AURIX — Institutional Personal Wealth & Money Management
+            ## 🚀 AURIX PRO — Cross-Platform Signed Release (${{ github.ref_name }})
 
-            This release was automatically built, tested, signed, and published by GitHub Actions.
+            This release was automatically built, tested, signed, and published by GitHub Actions for **Android** and **iOS**.
 
-            ### 📱 Package & Compatibility Info
+            ### 📱 Package & Platform Details
             - **Application ID**: `io.aurix.app`
-            - **Signing Signature**: Consistent key signature (supports 1-click update over existing app).
+            - **Android Signed APK**: `apps/android/AURIX-PRO-android-release.apk`
+            - **iOS iPhone Xcode Bundle**: `apps/iphone/AURIX-PRO-ios-bundle.zip`
 
-            ### 📥 Download & Install
-            Download `AURIX-latest-release.apk` below and install or update directly on your Android device.
-          files: release-apk/*.apk
+            ### 📥 Download Options
+            1. **Android**: Download `AURIX-PRO-android-release.apk` for direct 1-click update.
+            2. **iOS (iPhone & iPad)**: Download `AURIX-PRO-ios-bundle.zip` for instant Xcode compilation & deployment.
+          files: |
+            apps/android/AURIX-PRO-android-release.apk
+            apps/android/app-release.apk
+            apps/iphone/AURIX-PRO-ios-bundle.zip
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
