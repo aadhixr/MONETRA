@@ -217,16 +217,22 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
           </div>
           <div className="hidden sm:flex items-center gap-2">
             <img
+              src="/monetra-classic-gold.jpg"
+              alt="Classic Gold Professional"
+              title="Classic Professional Gold Monogram"
+              className="w-10 h-10 rounded-xl border border-[#D4AF37]/80 object-cover ring-1 ring-[#D4AF37]/50"
+            />
+            <img
               src="/monetra-shield-m.jpg"
               alt="Growth Shield M"
-              title="Primary: Growth Shield M Monogram"
-              className="w-10 h-10 rounded-xl border border-[#E7FF32]/60 object-cover ring-1 ring-[#E7FF32]"
+              title="Modern: Growth Shield M Monogram"
+              className="w-9 h-9 rounded-xl border border-[#30352B] object-cover opacity-80 hover:opacity-100 transition-opacity"
             />
             <img
               src="/monetra-logo-v2.jpg"
               alt="Infinite Ribbon Variant"
-              title="Variant: Infinite Ribbon Monogram"
-              className="w-9 h-9 rounded-xl border border-[#30352B] object-cover opacity-75 hover:opacity-100 transition-opacity"
+              title="Modern: Infinite Ribbon Monogram"
+              className="w-9 h-9 rounded-xl border border-[#30352B] object-cover opacity-70 hover:opacity-100 transition-opacity"
             />
           </div>
         </div>
