@@ -1,4 +1,4 @@
-// MONETRA V3 - Transaction Repository
+// AURIX - Transaction Repository
 import { db } from '../database';
 import type { Transaction, TransactionType, PaymentMethod } from '../../types';
 import { AccountRepository } from './accountRepository';
@@ -148,3 +148,4 @@ export const TransactionRepository = {
     return cloned;
   },
 };
+

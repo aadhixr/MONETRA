@@ -1,4 +1,4 @@
-// MONETRA V3 - Clean Initial Database Seed
+// AURIX - Clean Initial Database Seed
 import { db } from './database';
 import type { Category, Account, AppSettings, Transaction } from '../types';
 import { AccountingEngine } from '../engine/accountingEngine';
@@ -289,3 +289,4 @@ export async function consolidateUserAccounts(): Promise<void> {
     await db.accounts.update(acc.id, { current_balance_paise: bal, updated_at: now });
   }
 }
+

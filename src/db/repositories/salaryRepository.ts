@@ -1,4 +1,4 @@
-// MONETRA V3 - Salary & Income Stream Repository
+// AURIX - Salary & Income Stream Repository
 import { db } from '../database';
 import type { SalaryRecord } from '../../types';
 import { TransactionRepository } from './transactionRepository';
@@ -82,3 +82,4 @@ export const SalaryRepository = {
     await db.salary_records.delete(id);
   },
 };
+

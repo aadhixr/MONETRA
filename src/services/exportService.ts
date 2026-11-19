@@ -1,4 +1,4 @@
-// MONETRA V3 - Multi-Format Financial Export Service (CSV, JSON, PDF)
+// AURIX - Multi-Format Financial Export Service (CSV, JSON, PDF)
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import type { Transaction, Account, Category } from '../types';
@@ -13,7 +13,7 @@ export class ExportService {
     transactions: Transaction[],
     accounts: Account[],
     categories: Category[],
-    filename = 'monetra_transactions.csv'
+    filename = 'aurix_transactions.csv'
   ): void {
     const accountMap = new Map(accounts.map((a) => [a.id, a.name]));
     const categoryMap = new Map(categories.map((c) => [c.id, c.name]));
@@ -76,10 +76,10 @@ export class ExportService {
     doc.rect(0, 0, 210, 42, 'F');
 
     // Title & Neon Accent
-    doc.setTextColor(231, 255, 50); // #E7FF32 Neon Lime
+    doc.setTextColor(212, 175, 55); // #D4AF37 Gold
     doc.setFontSize(22);
     doc.setFont('helvetica', 'bold');
-    doc.text('MONETRA', 14, 20);
+    doc.text('AURIX', 14, 20);
 
     doc.setTextColor(255, 255, 255);
     doc.setFontSize(12);
@@ -149,6 +149,7 @@ export class ExportService {
       margin: { left: 14, right: 14 },
     });
 
-    doc.save(`monetra_statement_${month}.pdf`);
+    doc.save(`aurix_statement_${month}.pdf`);
   }
 }
+

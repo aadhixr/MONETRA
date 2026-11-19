@@ -1,4 +1,4 @@
-// MONETRA V3 - Multi-Account Management Modal
+// AURIX - Multi-Account Management Modal
 // Clearly separates Primary (Spending) and Savings Accounts with 1-click Edit / Add Bank Name
 import React, { useState } from 'react';
 import { Plus, Wallet, Landmark, Smartphone, PiggyBank, ArrowRightLeft, Archive, Edit2, Check } from 'lucide-react';
@@ -396,3 +396,4 @@ export const AccountsModal: React.FC<AccountsModalProps> = ({
     </Modal>
   );
 };
+

@@ -1,4 +1,4 @@
-// MONETRA V3 - Recurring Bills & Subscription Tracker Modal
+// AURIX - Recurring Bills & Subscription Tracker Modal
 import React, { useState } from 'react';
 import { Plus, Receipt, CheckCircle, Clock, Calendar, Check, Trash2 } from 'lucide-react';
 import { Modal } from '../common/Modal';
@@ -307,3 +307,4 @@ export const RecurringBillsModal: React.FC<RecurringBillsModalProps> = ({
     </Modal>
   );
 };
+

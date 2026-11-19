@@ -1,4 +1,4 @@
-// MONETRA V3 - Settings & Local DB Administration Repository
+// AURIX - Settings & Local DB Administration Repository
 import { db } from '../database';
 import type { AppSettings } from '../../types';
 import { initializeDatabaseIfEmpty } from '../seed';
@@ -112,3 +112,4 @@ export const SettingsRepository = {
     await initializeDatabaseIfEmpty();
   },
 };
+

@@ -1,4 +1,4 @@
-// MONETRA V3 - Home Monthly Overview Component (Interactive Ledger Breakdown Popups)
+// AURIX - Home Monthly Overview Component (Interactive Ledger Breakdown Popups)
 import React, { useState, useMemo } from 'react';
 import { ArrowDownLeft, ArrowUpRight, Wallet, Target, CalendarDays, PiggyBank, Landmark, Layers, CheckCircle2, ChevronRight, X, ArrowRight } from 'lucide-react';
 import { Card } from '../common/Card';
@@ -583,3 +583,4 @@ export const MonthlyOverview: React.FC<MonthlyOverviewProps> = ({ onNavigateToBu
     </>
   );
 };
+

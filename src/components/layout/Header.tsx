@@ -1,4 +1,4 @@
-// MONETRA V3 - Top Application Header & Responsive Desktop Navigation
+// AURIX - Top Application Header & Responsive Desktop Navigation
 import React, { useState, useRef, useEffect } from 'react';
 import {
   Wallet,
@@ -315,3 +315,4 @@ export const Header: React.FC<HeaderProps> = ({
     </header>
   );
 };
+

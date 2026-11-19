@@ -1,4 +1,4 @@
-// MONETRA V3 - Category Icon Component
+// AURIX - Category Icon Component
 import React from 'react';
 import * as Icons from 'lucide-react';
 
@@ -30,3 +30,4 @@ export const CategoryIcon: React.FC<CategoryIconProps> = ({
     </div>
   );
 };
+

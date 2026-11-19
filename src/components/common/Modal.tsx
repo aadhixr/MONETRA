@@ -1,4 +1,4 @@
-// MONETRA V3 - Mobile Bottom Sheet & Dialog Modal
+// AURIX - Mobile Bottom Sheet & Dialog Modal
 import React, { useEffect } from 'react';
 import { X } from 'lucide-react';
 
@@ -73,3 +73,4 @@ export const Modal: React.FC<ModalProps> = ({
     </div>
   );
 };
+

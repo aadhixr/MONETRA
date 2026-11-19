@@ -1,4 +1,4 @@
-// MONETRA V3 - Integer Paise Currency Engine
+// AURIX - Integer Paise Currency Engine
 // Adheres strictly to institutional fintech standards: Zero IEEE 754 floating point distortion.
 
 /**
@@ -94,3 +94,4 @@ export const PaiseMath = {
     return Math.round((part / total) * 100);
   }
 };
+

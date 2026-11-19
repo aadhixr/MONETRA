@@ -1,4 +1,4 @@
-// MONETRA V3 - Fixed Mobile Bottom Navigation Bar
+// AURIX - Fixed Mobile Bottom Navigation Bar
 import React from 'react';
 import { Home, PieChart, PiggyBank, Sparkles, Plus } from 'lucide-react';
 
@@ -92,3 +92,4 @@ export const BottomNav: React.FC<BottomNavProps> = ({
     </div>
   );
 };
+

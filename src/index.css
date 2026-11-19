@@ -2,6 +2,19 @@
 @import "./styles/themes.css";
 
 @theme {
+  --color-aurix-bg: #090B08;
+  --color-aurix-bg-secondary: #151812;
+  --color-aurix-card: #1C2019;
+  --color-aurix-card-elevated: #23281F;
+  --color-aurix-accent: #E7FF32;
+  --color-aurix-accent-secondary: #C9E927;
+  --color-aurix-text-primary: #FFFFFF;
+  --color-aurix-text-secondary: #A1A69A;
+  --color-aurix-border: #30352B;
+  --color-aurix-success: #A8E66A;
+  --color-aurix-error: #FF6868;
+  --color-aurix-warning: #FFD166;
+
   --color-monetra-bg: #090B08;
   --color-monetra-bg-secondary: #151812;
   --color-monetra-card: #1C2019;

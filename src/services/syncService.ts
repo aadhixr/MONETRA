@@ -1,4 +1,4 @@
-// MONETRA V3 - Optional Supabase Cloud Sync & Encrypted Backup Service
+// AURIX - Optional Supabase Cloud Sync & Encrypted Backup Service
 // 100% Optional. Disabled by default. Zero data leaves the device unless explicitly configured.
 
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
@@ -232,3 +232,4 @@ export class SyncService {
     return new TextDecoder().decode(decrypted);
   }
 }
+

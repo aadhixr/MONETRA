@@ -1,4 +1,4 @@
-// MONETRA V3 - High-Fidelity AI Financial Assistant Chat Interface
+// AURIX - High-Fidelity AI Financial Assistant Chat Interface
 import React, { useState, useRef, useEffect } from 'react';
 import { Sparkles, Send, Bot, ShieldCheck, RefreshCw } from 'lucide-react';
 import { Card } from '../common/Card';
@@ -28,7 +28,7 @@ export const AIAssistantChat: React.FC = () => {
     {
       id: 'msg_welcome',
       sender: 'ai',
-      text: `Hello! I am your **MONETRA AI Financial Assistant**.\n\nI analyze your local financial ledger with 100% precision. Ask me about your debited expenses, salary credits, remaining balance, or if you can afford a purchase!`,
+      text: `Hello! I am your **AURIX AI Financial Assistant**.\n\nI analyze your local financial ledger with 100% precision. Ask me about your debited expenses, salary credits, remaining balance, or if you can afford a purchase!`,
       timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
     },
   ]);
@@ -114,7 +114,7 @@ export const AIAssistantChat: React.FC = () => {
           </div>
           <div>
             <h3 className="text-xs font-bold text-white uppercase tracking-wider">
-              MONETRA AI Assistant
+              AURIX AI Assistant
             </h3>
             <span className="text-[10px] text-[#A8E66A] flex items-center">
               <ShieldCheck className="w-3 h-3 mr-1 inline" /> 100% Private On-Device AI
@@ -206,3 +206,4 @@ export const AIAssistantChat: React.FC = () => {
     </Card>
   );
 };
+

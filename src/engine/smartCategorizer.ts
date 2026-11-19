@@ -1,4 +1,4 @@
-// MONETRA V3 - Smart Category Detection Engine
+// AURIX - Smart Category Detection Engine
 // Identifies transaction categories intelligently from expenditure descriptions,
 // merchant brands, keywords, and historical user habits.
 import type { Category, Transaction, TransactionType } from '../types';
@@ -352,3 +352,4 @@ export class SmartCategorizer {
     return null;
   }
 }
+

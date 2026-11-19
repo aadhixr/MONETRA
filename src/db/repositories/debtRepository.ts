@@ -1,4 +1,4 @@
-// MONETRA V3 - Debt Management Repository (Lent / Borrowed)
+// AURIX - Debt Management Repository (Lent / Borrowed)
 import { db } from '../database';
 import type { Debt, DebtPayment } from '../../types';
 import { TransactionRepository } from './transactionRepository';
@@ -113,3 +113,4 @@ export const DebtRepository = {
     });
   },
 };
+

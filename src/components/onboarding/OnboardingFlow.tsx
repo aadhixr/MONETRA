@@ -1,4 +1,4 @@
-// MONETRA V3 - Streamlined Fintech Onboarding with Optional JSON Restore
+// AURIX - Streamlined Fintech Onboarding with Optional JSON Restore
 import React, { useState } from 'react';
 import { Sparkles, ArrowRight, ShieldCheck, Landmark, Calendar, Clock, Upload, PlusCircle, ChevronLeft, CheckCircle2 } from 'lucide-react';
 import { Button } from '../common/Button';
@@ -60,7 +60,7 @@ export const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ onComplete }) =>
           await refreshData();
           onComplete();
         } else {
-          setErrorMsg('Import failed. Invalid MONETRA JSON backup file.');
+          setErrorMsg('Import failed. Invalid AURIX JSON backup file.');
           setIsSubmitting(false);
         }
       };
@@ -154,10 +154,10 @@ export const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ onComplete }) =>
         {/* Brand header */}
         <div className="flex items-center justify-between pb-5 border-b border-[#30352B]/60">
           <div className="flex items-center space-x-2.5">
-            <div className="w-3 h-3 rounded-full bg-[#E7FF32] shadow-[0_0_10px_#E7FF32]" />
-            <span className="text-base font-black tracking-widest text-[#E7FF32]">MONETRA</span>
+            <img src="/logo.jpg" alt="AURIX" className="w-6 h-6 rounded-lg object-cover ring-1 ring-[#D4AF37]/50" />
+            <span className="text-base font-black tracking-widest text-white">AURIX</span>
           </div>
-          <div className="flex items-center space-x-1 text-[#A8E66A] text-xs font-semibold">
+          <div className="flex items-center space-x-1 text-[#D4AF37] text-xs font-semibold">
             <ShieldCheck className="w-4 h-4" />
             <span>Institutional Precision</span>
           </div>
@@ -167,11 +167,11 @@ export const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ onComplete }) =>
         {step === 'choice' && (
           <div className="mt-6 space-y-6">
             <div className="text-left space-y-1.5">
-              <div className="w-11 h-11 rounded-2xl bg-[#E7FF32]/15 text-[#E7FF32] flex items-center justify-center mb-2">
+              <div className="w-11 h-11 rounded-2xl bg-[#D4AF37]/15 text-[#D4AF37] flex items-center justify-center mb-2">
                 <Sparkles className="w-5 h-5 stroke-[2.2]" />
               </div>
               <h1 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
-                Welcome to MONETRA
+                Welcome to AURIX
               </h1>
               <p className="text-xs sm:text-sm text-[#A1A69A]">
                 Choose how you want to set up your financial ledger:
@@ -244,7 +244,7 @@ export const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ onComplete }) =>
             <div>
               <h2 className="text-xl font-bold text-white">Import Backup File</h2>
               <p className="text-xs text-[#A1A69A] mt-1">
-                Select your saved <code className="text-[#A8E66A]">monetra_vault_backup.json</code> file to restore your full ledger.
+                Select your saved <code className="text-[#A8E66A]">aurix_vault_backup.json</code> file to restore your full ledger.
               </p>
             </div>
 
@@ -252,7 +252,7 @@ export const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ onComplete }) =>
               <Upload className="w-8 h-8 text-[#A8E66A] mx-auto mb-2" />
               <p className="text-xs font-bold text-white">Select JSON Backup File</p>
               <p className="text-[11px] text-[#A1A69A] mt-0.5 mb-4">
-                Supports all MONETRA V3 backup formats
+                Supports all AURIX / MONETRA backup formats
               </p>
 
               <label className="inline-flex items-center justify-center space-x-2 py-2.5 px-5 bg-[#A8E66A] text-[#090B08] hover:bg-[#8BD64A] rounded-xl text-xs font-bold cursor-pointer transition-all shadow-[0_0_12px_rgba(168,230,106,0.3)]">
@@ -491,7 +491,7 @@ export const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ onComplete }) =>
                   disabled={isSubmitting}
                   className="py-3.5 text-sm font-bold flex items-center justify-center space-x-2"
                 >
-                  <span>{isSubmitting ? 'Configuring MONETRA...' : 'Get Started with MONETRA'}</span>
+                  <span>{isSubmitting ? 'Configuring AURIX...' : 'Get Started with AURIX'}</span>
                   <ArrowRight className="w-4 h-4" />
                 </Button>
               </div>
@@ -502,3 +502,4 @@ export const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ onComplete }) =>
     </div>
   );
 };
+

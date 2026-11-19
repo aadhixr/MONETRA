@@ -1,4 +1,4 @@
-// MONETRA V3 - Account Repository
+// AURIX - Account Repository
 import { db } from '../database';
 import type { Account, AccountType } from '../../types';
 import { AccountingEngine } from '../../engine/accountingEngine';
@@ -78,3 +78,4 @@ export const AccountRepository = {
     return accounts;
   },
 };
+

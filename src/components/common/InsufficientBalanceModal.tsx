@@ -1,4 +1,4 @@
-// MONETRA V3 - Insufficient Balance Warning & Overdraft Protection Popup
+// AURIX - Insufficient Balance Warning & Overdraft Protection Popup
 import React from 'react';
 import { AlertTriangle, AlertCircle, ArrowRightLeft, MinusCircle } from 'lucide-react';
 import { Modal } from './Modal';
@@ -123,3 +123,4 @@ export const InsufficientBalanceModal: React.FC<InsufficientBalanceModalProps> =
     </Modal>
   );
 };
+

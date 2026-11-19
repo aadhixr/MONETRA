@@ -1,4 +1,4 @@
-// MONETRA V3 - High-Velocity Add / Edit Transaction System
+// AURIX - High-Velocity Add / Edit Transaction System
 import React, { useState, useEffect } from 'react';
 import { Camera, Check, ArrowRightLeft, TrendingDown, TrendingUp, Calendar, CreditCard, FileText, AlertCircle, Sparkles } from 'lucide-react';
 import { Modal } from '../common/Modal';
@@ -716,3 +716,4 @@ export const AddTransactionModal: React.FC<AddTransactionModalProps> = ({
     </Modal>
   );
 };
+

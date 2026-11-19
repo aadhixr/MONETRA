@@ -1,4 +1,4 @@
-// MONETRA V3 - Complete Automated Test Suite (Validating Section 25 Test Cases)
+// AURIX - Complete Automated Test Suite (Validating Section 25 Test Cases)
 import { AccountingEngine } from '../engine/accountingEngine';
 import { toPaise, toRupees, formatPaise, PaiseMath } from '../engine/currency';
 import { getPreviousMonth, getNextMonth, getMonthEndDate } from '../engine/dateUtils';
@@ -19,7 +19,7 @@ function assert(condition: boolean, testName: string, detail?: string) {
 
 async function runTestSuite() {
   console.log('====================================================');
-  console.log('MONETRA V3: SECTION 25 FINANCIAL VALIDATION TEST SUITE');
+  console.log('AURIX: SECTION 25 FINANCIAL VALIDATION TEST SUITE');
   console.log('====================================================\n');
 
   // TEST 1: Create a cash account with ₹10,000. Expected balance: ₹10,000.
@@ -1498,3 +1498,4 @@ runTestSuite().catch((err) => {
   console.error(err);
   process.exit(1);
 });
+

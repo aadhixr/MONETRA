@@ -1,8 +1,8 @@
-# MONETRA V3 — Institutional Personal Finance & Money Management
+# AURIX — Institutional Personal Wealth & Money Management
 
 > **"Precision in every paisa, beauty in every pixel."**
 
-MONETRA V3 is a commercial-grade, mobile-first personal finance application engineered strictly to the design aesthetics of **Neon Lime (`#E7FF32`)** on **Deep Obsidian Black (`#090B08`) and Charcoal (`#151812`, `#1C2019`)**.
+AURIX is a commercial-grade, mobile-first personal wealth and finance application engineered strictly for luxury dark fintech aesthetics with 8 switchable color themes (defaulting to **Monochrome State** with brushed titanium and champagne gold accents).
 
 It operates with institutional double-entry financial rigor—eliminating IEEE 754 floating-point inaccuracies through an integer-paise mathematical calculation engine.
 

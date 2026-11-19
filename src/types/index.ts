@@ -1,4 +1,4 @@
-// MONETRA V3 - Global Financial Domain Model Types
+// AURIX - Global Financial Domain Model Types
 
 export type AccountType = 'cash' | 'bank' | 'upi' | 'savings' | 'custom';
 
@@ -227,3 +227,4 @@ export interface MonthlyOverviewSummary {
   budget_remaining_paise: number;
   budget_percent_used: number;
 }
+

@@ -1,4 +1,4 @@
-// MONETRA V3 - Common Financial Card Component
+// AURIX - Common Financial Card Component
 import React from 'react';
 import { clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
@@ -35,3 +35,4 @@ export const Card: React.FC<CardProps> = ({
     </div>
   );
 };
+

@@ -1,4 +1,4 @@
-// MONETRA V3 - Settings, Privacy & Cloud Vault Management
+// AURIX - Settings, Privacy & Cloud Vault Management
 import React, { useState } from 'react';
 import { Settings, User, Cloud, Database, Download, Upload, Shield, Trash2, CheckCircle2, Palette, Check, Smartphone, RefreshCw, ExternalLink, Info } from 'lucide-react';
 import { Modal } from '../common/Modal';
@@ -88,7 +88,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
   const handleExportJSON = async () => {
     try {
       const jsonStr = await SettingsRepository.exportAllData();
-      const filename = `monetra_vault_backup_${new Date().toISOString().slice(0, 10)}.json`;
+      const filename = `aurix_vault_backup_${new Date().toISOString().slice(0, 10)}.json`;
 
       // Universal Data URI download (Works on Desktop + Android WebView)
       const dataUri = `data:application/json;charset=utf-8,${encodeURIComponent(jsonStr)}`;
@@ -125,7 +125,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
           setSyncStatusMsg('Backup imported successfully! All records restored.');
           setTimeout(() => setSyncStatusMsg(null), 4000);
         } else {
-          setSyncStatusMsg('Import failed. Invalid MONETRA JSON backup file.');
+          setSyncStatusMsg('Import failed. Invalid AURIX / MONETRA JSON backup file.');
         }
       };
       reader.onerror = () => {
@@ -167,7 +167,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
           checked: true,
           hasUpdate: false,
           latestTag,
-          message: `You are running the latest version of MONETRA V3 (${CURRENT_APP_VERSION}).`,
+          message: `You are running the latest version of AURIX (${CURRENT_APP_VERSION}).`,
         });
       }
     } catch (err: any) {
@@ -471,7 +471,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
           <div className="grid grid-cols-3 gap-2 text-center py-1">
             <div className="p-2 bg-[#1C2019] border border-[#30352B] rounded-xl">
               <span className="block text-[10px] text-[#A1A69A] uppercase tracking-wider">App Name</span>
-              <span className="text-xs font-bold text-white">MONETRA V3</span>
+              <span className="text-xs font-bold text-white">AURIX PRO</span>
             </div>
             <div className="p-2 bg-[#1C2019] border border-[#30352B] rounded-xl">
               <span className="block text-[10px] text-[#A1A69A] uppercase tracking-wider">Version</span>
@@ -535,3 +535,4 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
     </Modal>
   );
 };
+

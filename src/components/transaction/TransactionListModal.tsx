@@ -1,4 +1,4 @@
-// MONETRA V3 - Full Transaction History & Filter Modal (Supports Filtering by Month)
+// AURIX - Full Transaction History & Filter Modal (Supports Filtering by Month)
 import React, { useState, useEffect, useMemo } from 'react';
 import { Search, Filter, ArrowRightLeft, Image, Trash2, Edit2, Copy, Download, Calendar, ArrowDownLeft, ArrowUpRight } from 'lucide-react';
 import { Modal } from '../common/Modal';
@@ -356,3 +356,4 @@ export const TransactionListModal: React.FC<TransactionListModalProps> = ({
     </Modal>
   );
 };
+

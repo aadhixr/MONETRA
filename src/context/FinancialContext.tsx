@@ -1,4 +1,4 @@
-// MONETRA V3 - Centralized Reactive Financial Context
+// AURIX - Centralized Reactive Financial Context
 import React, { createContext, useContext, useEffect, useState, useMemo, useCallback } from 'react';
 import type {
   Account,
@@ -13,7 +13,7 @@ import type {
   AppSettings,
   MonthlyOverviewSummary,
 } from '../types';
-import { db } from '../db/database';
+import { db, migrateLegacyMonetraData } from '../db/database';
 import { initializeDatabaseIfEmpty, consolidateUserAccounts } from '../db/seed';
 import { AccountRepository } from '../db/repositories/accountRepository';
 import { TransactionRepository } from '../db/repositories/transactionRepository';
@@ -115,6 +115,7 @@ export const FinancialProvider: React.FC<{ children: React.ReactNode }> = ({ chi
 
   const loadData = useCallback(async () => {
     try {
+      await migrateLegacyMonetraData();
       await initializeDatabaseIfEmpty();
       await consolidateUserAccounts();
       // Automatically establish monthly budget from credited salary:
@@ -412,3 +413,4 @@ export const useFinancial = (): FinancialContextType => {
   if (!ctx) throw new Error('useFinancial must be used within a FinancialProvider');
   return ctx;
 };
+

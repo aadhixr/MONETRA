@@ -1,4 +1,4 @@
-// MONETRA V3 - Local AI Spending Insights & Natural Language Financial Engine
+// AURIX - Local AI Spending Insights & Natural Language Financial Engine
 // Grounded strictly in real transaction records. 100% offline-first.
 
 import type { Transaction, Account, Category, MonthlyBudget } from '../types';
@@ -197,7 +197,7 @@ export class AIInsightsService {
     ) {
       return {
         answer:
-          `Hello! I am your **MONETRA AI Financial Assistant**.\n\n` +
+          `Hello! I am your **AURIX AI Financial Assistant**.\n\n` +
           `I analyze your local financial ledger on-device with zero cloud tracking. Here is what you can ask me:\n` +
           `• **"How much did I spend this month?"**\n` +
           `• **"What was debited?"** (or recent debits)\n` +
@@ -491,3 +491,4 @@ export class AIInsightsService {
     };
   }
 }
+

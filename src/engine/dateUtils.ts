@@ -1,4 +1,4 @@
-// MONETRA V3 - Date & Month Utilities
+// AURIX - Date & Month Utilities
 // Pure arithmetic, zero timezone offset bugs, institutional reliability.
 
 /**
@@ -104,3 +104,4 @@ export function isPastMonth(monthStr: string): boolean {
 export function isFutureMonth(monthStr: string): boolean {
   return monthStr > getCurrentMonthStr();
 }
+

@@ -1,4 +1,4 @@
-// MONETRA V3 - Sleek Thin Financial Progress Bar
+// AURIX - Sleek Thin Financial Progress Bar
 import React from 'react';
 import { clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
@@ -50,3 +50,4 @@ export const ProgressBar: React.FC<ProgressBarProps> = ({
     </div>
   );
 };
+

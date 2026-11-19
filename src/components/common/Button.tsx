@@ -1,4 +1,4 @@
-// MONETRA V3 - Common Button Component
+// AURIX - Common Button Component
 import React from 'react';
 import { clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
@@ -53,3 +53,4 @@ export const Button: React.FC<ButtonProps> = ({
     </button>
   );
 };
+

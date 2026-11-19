@@ -1,4 +1,4 @@
-// MONETRA V3 - Multi-Theme Financial Aesthetic Engine
+// AURIX - Multi-Theme Financial Aesthetic Engine
 import type { ThemeId } from '../types';
 
 export interface ThemeConfig {
@@ -198,3 +198,4 @@ export function applyThemeToDocument(themeId?: string): void {
     document.documentElement.style.setProperty('--theme-glow', config.glowColor);
   }
 }
+

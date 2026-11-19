@@ -1,4 +1,4 @@
-// MONETRA V3 - Recent Transactions List & Institutional Ledger Display
+// AURIX - Recent Transactions List & Institutional Ledger Display
 import React, { useState } from 'react';
 import { ArrowRight, Copy, Edit2, Trash2, Image, ArrowRightLeft, CheckCircle2, ShieldCheck, ArrowDownLeft, ArrowUpRight } from 'lucide-react';
 import { Card } from '../common/Card';
@@ -352,3 +352,4 @@ export const RecentTransactions: React.FC<RecentTransactionsProps> = ({
     </div>
   );
 };
+

@@ -1,4 +1,4 @@
-// MONETRA V3 - Institutional Financial Accounting Engine
+// AURIX - Institutional Financial Accounting Engine
 // Pure integer paise arithmetic, zero floating-point imprecision, robust double-entry principles.
 
 import type { Account, Transaction, CategoryBudget, MonthlyOverviewSummary } from '../types';
@@ -328,3 +328,4 @@ export class AccountingEngine {
     return 'normal';
   }
 }
+

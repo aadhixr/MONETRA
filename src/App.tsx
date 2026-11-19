@@ -1,4 +1,4 @@
-// MONETRA V3 - Main Application Architecture & Orchestrator
+// AURIX - Main Application Architecture & Orchestrator
 import React, { useState } from 'react';
 import { FinancialProvider, useFinancial } from './context/FinancialContext';
 import { Header } from './components/layout/Header';
@@ -49,7 +49,7 @@ const MainAppContent: React.FC = () => {
         <div className="flex flex-col items-center space-y-3">
           <div className="w-12 h-12 rounded-full border-2 border-[#30352B] border-t-[#E7FF32] animate-spin" />
           <span className="text-xs font-bold uppercase tracking-widest text-[#E7FF32]">
-            Loading MONETRA...
+            Loading AURIX...
           </span>
         </div>
       </div>
@@ -177,3 +177,4 @@ export default function App() {
     </FinancialProvider>
   );
 }
+

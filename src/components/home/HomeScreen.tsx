@@ -1,4 +1,4 @@
-// MONETRA V3 - Primary Screen 1: Home Dashboard (Primary Spending Only - No Savings, No Net Worth)
+// AURIX - Primary Screen 1: Home Dashboard (Primary Spending Only - No Savings, No Net Worth)
 import React from 'react';
 import { ChevronRight, Receipt, Landmark, Plus, Edit2, Wallet } from 'lucide-react';
 import { BalanceCard } from './BalanceCard';
@@ -175,3 +175,4 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
     </div>
   );
 };
+

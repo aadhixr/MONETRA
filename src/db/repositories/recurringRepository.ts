@@ -1,4 +1,4 @@
-// MONETRA V3 - Recurring Bills & Subscriptions Repository
+// AURIX - Recurring Bills & Subscriptions Repository
 import { db } from '../database';
 import type { RecurringBill, BillInstance } from '../../types';
 import { TransactionRepository } from './transactionRepository';
@@ -105,3 +105,4 @@ export const RecurringRepository = {
     });
   },
 };
+

@@ -1,4 +1,4 @@
-// MONETRA V3 - Debt & IOUs Management Modal (Money Lent & Borrowed)
+// AURIX - Debt & IOUs Management Modal (Money Lent & Borrowed)
 import React, { useState } from 'react';
 import { Plus, ArrowUpRight, ArrowDownLeft, CheckCircle2, User, Trash2 } from 'lucide-react';
 import { Modal } from '../common/Modal';
@@ -356,3 +356,4 @@ export const DebtManagerModal: React.FC<DebtManagerModalProps> = ({
     </Modal>
   );
 };
+

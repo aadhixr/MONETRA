@@ -1,4 +1,4 @@
-// MONETRA V3 - Salary & Income Stream Management
+// AURIX - Salary & Income Stream Management
 // Supports Exact and Variable Salary Dates (e.g. 5th, 6th, 7th, or 4-day flexible window)
 import React, { useState } from 'react';
 import { Landmark, Plus, CheckCircle2, Clock, Calendar, Briefcase, Trash2 } from 'lucide-react';
@@ -439,3 +439,4 @@ export const SalaryManagerModal: React.FC<SalaryManagerModalProps> = ({
     </Modal>
   );
 };
+

@@ -1,4 +1,4 @@
-// MONETRA V3 - Primary Screen 4: Spending Insights & AI (Based on Reference Design Phone 4)
+// AURIX - Primary Screen 4: Spending Insights & AI (Based on Reference Design Phone 4)
 import React, { useState, useMemo } from 'react';
 import {
   BarChart,
@@ -593,3 +593,4 @@ export const InsightsScreen: React.FC = () => {
     </div>
   );
 };
+

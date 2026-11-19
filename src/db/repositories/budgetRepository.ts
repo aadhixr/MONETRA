@@ -1,4 +1,4 @@
-// MONETRA V3 - Budget Repository
+// AURIX - Budget Repository
 import { db } from '../database';
 import type { MonthlyBudget, CategoryBudget } from '../../types';
 
@@ -137,3 +137,4 @@ export const BudgetRepository = {
     return undefined;
   },
 };
+

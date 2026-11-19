@@ -1,4 +1,4 @@
-// MONETRA V3 - Financial Calendar Modal
+// AURIX - Financial Calendar Modal
 import React, { useState } from 'react';
 import { Calendar as CalendarIcon, ChevronLeft, ChevronRight, Dot } from 'lucide-react';
 import { Modal } from '../common/Modal';
@@ -191,3 +191,4 @@ export const FinancialCalendarModal: React.FC<FinancialCalendarModalProps> = ({
     </Modal>
   );
 };
+

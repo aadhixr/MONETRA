@@ -1,4 +1,4 @@
-// MONETRA V3 - Home Main Balance Card (Interactive Account Switcher & Balance Display)
+// AURIX - Home Main Balance Card (Interactive Account Switcher & Balance Display)
 import React, { useState } from 'react';
 import { Eye, EyeOff, Edit2, ChevronDown, Landmark, PiggyBank } from 'lucide-react';
 import { Card } from '../common/Card';
@@ -247,3 +247,4 @@ export const BalanceCard: React.FC<BalanceCardProps> = ({
     </Card>
   );
 };
+

@@ -1,4 +1,4 @@
-// MONETRA V3 - Home Quick Action Buttons
+// AURIX - Home Quick Action Buttons
 import React from 'react';
 import { Minus, Plus, ArrowRightLeft, Landmark } from 'lucide-react';
 import type { TransactionType } from '../../types';
@@ -64,3 +64,4 @@ export const QuickActions: React.FC<QuickActionsProps> = ({
     </div>
   );
 };
+

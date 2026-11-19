@@ -1,4 +1,4 @@
-// MONETRA V3 - Primary Screen 2: Budget Planner (Based on Reference Design Phone 2)
+// AURIX - Primary Screen 2: Budget Planner (Based on Reference Design Phone 2)
 import React, { useState } from 'react';
 import { Plus, Copy, AlertTriangle, CheckCircle, TrendingUp, Sparkles, Edit3, Trash2 } from 'lucide-react';
 import { Card } from '../common/Card';
@@ -421,3 +421,4 @@ export const BudgetScreen: React.FC = () => {
     </div>
   );
 };
+

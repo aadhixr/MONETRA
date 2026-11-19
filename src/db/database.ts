@@ -1,4 +1,4 @@
-// MONETRA V3 - Local IndexedDB Database using Dexie.js
+// AURIX - Local IndexedDB Database using Dexie.js
 import Dexie, { type Table } from 'dexie';
 import type {
   Account,
@@ -17,7 +17,7 @@ import type {
   AuditEvent,
 } from '../types';
 
-export class MonetraDatabase extends Dexie {
+export class AurixDatabase extends Dexie {
   accounts!: Table<Account, string>;
   transactions!: Table<Transaction, string>;
   categories!: Table<Category, string>;
@@ -34,7 +34,7 @@ export class MonetraDatabase extends Dexie {
   audit_events!: Table<AuditEvent, string>;
 
   constructor() {
-    super('MonetraDB_v3');
+    super('AurixDB_v1');
 
     this.version(1).stores({
       accounts: 'id, name, type, is_archived, created_at',
@@ -55,4 +55,34 @@ export class MonetraDatabase extends Dexie {
   }
 }
 
-export const db = new MonetraDatabase();
+export const db = new AurixDatabase();
+export const MonetraDatabase = AurixDatabase;
+
+/**
+ * Seamless zero-data-loss migration from MonetraDB_v3 to AurixDB_v1
+ */
+export async function migrateLegacyMonetraData(): Promise<void> {
+  if (typeof window === 'undefined') return;
+  try {
+    const aurixAccountsCount = await db.accounts.count();
+    if (aurixAccountsCount > 0) return; // Already migrated or populated
+
+    const exists = await Dexie.exists('MonetraDB_v3');
+    if (!exists) return;
+
+    const legacyDb = new Dexie('MonetraDB_v3');
+    await legacyDb.open();
+    const tableNames = legacyDb.tables.map((t) => t.name);
+
+    for (const name of tableNames) {
+      const records = await legacyDb.table(name).toArray();
+      if (records && records.length > 0 && db.table(name)) {
+        await db.table(name).bulkPut(records);
+      }
+    }
+    legacyDb.close();
+  } catch (err) {
+    console.warn('Legacy migration bypassed:', err);
+  }
+}
+
