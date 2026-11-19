@@ -171,8 +171,8 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
     e.target.value = '';
   };
 
-  const CURRENT_APP_VERSION = 'v1.0.24';
-  const CURRENT_BUILD_NUMBER = '124';
+  const CURRENT_APP_VERSION = 'v1.0.35';
+  const CURRENT_BUILD_NUMBER = '35';
   const LAST_UPDATE_DATE = '19 Nov 2026';
 
   const parseSemVer = (tag: string): number[] => {
@@ -264,10 +264,9 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
             <div>
               <div className="flex items-center gap-2">
                 <h3 className="font-black text-base text-white tracking-wider">AURIX</h3>
-                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#D4AF37]/15 text-[#D4AF37] border border-[#D4AF37]/40">AURIX PRO</span>
+                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#D4AF37]/15 text-[#D4AF37] border border-[#D4AF37]/40">PRO</span>
               </div>
               <p className="text-xs text-[#A1A69A] mt-0.5">Institutional Wealth & Precision Ledger</p>
-              <div className="text-[10px] text-[#A8E66A] font-mono mt-0.5">100% On-Device • Zero Telemetry</div>
             </div>
           </div>
           <div className="hidden sm:flex items-center gap-2">

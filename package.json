@@ -1,7 +1,7 @@
 {
   "name": "aurix",
   "private": true,
-  "version": "1.0.24",
+  "version": "1.0.35",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "@capacitor/android": "^8.6.2",
+    "@capacitor/app": "^8.1.2",
     "@supabase/supabase-js": "^2.119.0",
     "@tailwindcss/vite": "^4.3.5",
     "canvas-confetti": "^1.9.4",
