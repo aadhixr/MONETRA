@@ -6,7 +6,7 @@
 
 **"Precision in every paisa, beauty in every pixel."**
 
-[![Version](https://img.shields.io/badge/version-v1.1.9-E7FF32?style=for-the-badge&logo=android&logoColor=black)](https://github.com/aadhixr/MONETRA/releases)
+[![Version](https://img.shields.io/badge/version-v1.1.7-E7FF32?style=for-the-badge&logo=android&logoColor=black)](https://github.com/aadhixr/MONETRA/releases)
 [![Build Status](https://img.shields.io/github/actions/workflow/status/aadhixr/MONETRA/release.yml?branch=main&style=for-the-badge&logo=github)](https://github.com/aadhixr/MONETRA/actions)
 [![Platform](https://img.shields.io/badge/platform-Android%20%7C%20iOS%20%7C%20Web-30352B?style=for-the-badge&logo=capacitor)](https://github.com/aadhixr/MONETRA)
 [![License](https://img.shields.io/badge/license-MIT-D4AF37?style=for-the-badge)](LICENSE)
