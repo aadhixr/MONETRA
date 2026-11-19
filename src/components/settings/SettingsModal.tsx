@@ -76,27 +76,56 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose, o
   };
 
   const handleExportJSON = async () => {
-    const jsonStr = await SettingsRepository.exportAllData();
-    const blob = new Blob([jsonStr], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = `monetra_vault_backup_${new Date().toISOString().slice(0, 10)}.json`;
-    link.click();
+    try {
+      const jsonStr = await SettingsRepository.exportAllData();
+      const filename = `monetra_vault_backup_${new Date().toISOString().slice(0, 10)}.json`;
+
+      // Universal Data URI download (Works on Desktop + Android WebView)
+      const dataUri = `data:application/json;charset=utf-8,${encodeURIComponent(jsonStr)}`;
+      const link = document.createElement('a');
+      link.setAttribute('href', dataUri);
+      link.setAttribute('download', filename);
+      link.style.display = 'none';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+
+      setSyncStatusMsg('JSON backup exported & downloaded successfully!');
+      setTimeout(() => setSyncStatusMsg(null), 4000);
+    } catch (err: any) {
+      setSyncStatusMsg(`Export failed: ${err.message}`);
+    }
   };
 
   const handleImportJSON = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (file) {
-      const text = await file.text();
-      const success = await SettingsRepository.importData(text);
-      if (success) {
-        await refreshData();
-        setSyncStatusMsg('Backup imported successfully!');
-      } else {
-        setSyncStatusMsg('Import failed. Invalid JSON backup file.');
-      }
+    if (!file) return;
+
+    try {
+      const reader = new FileReader();
+      reader.onload = async (event) => {
+        const text = event.target?.result as string;
+        if (!text) {
+          setSyncStatusMsg('Import failed. File is empty.');
+          return;
+        }
+        const success = await SettingsRepository.importData(text);
+        if (success) {
+          await refreshData();
+          setSyncStatusMsg('Backup imported successfully! All records restored.');
+          setTimeout(() => setSyncStatusMsg(null), 4000);
+        } else {
+          setSyncStatusMsg('Import failed. Invalid MONETRA JSON backup file.');
+        }
+      };
+      reader.onerror = () => {
+        setSyncStatusMsg('Failed to read file.');
+      };
+      reader.readAsText(file);
+    } catch (err: any) {
+      setSyncStatusMsg(`Import failed: ${err.message}`);
     }
+    e.target.value = '';
   };
 
   const handleFactoryReset = async () => {
@@ -331,6 +360,13 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose, o
                 >
                   Restore
                 </Button>
+              </div>
+
+              <div className="p-2.5 bg-[#151812] border border-[#30352B] rounded-xl text-[10px] text-[#A1A69A]">
+                <div className="font-bold text-white mb-1">Required Supabase Table SQL:</div>
+                <code className="block bg-[#090B08] p-1.5 rounded text-[#A8E66A] font-mono select-all overflow-x-auto">
+                  CREATE TABLE monetra_backups (user_id text primary key, payload text, updated_at text);
+                </code>
               </div>
             </div>
           )}

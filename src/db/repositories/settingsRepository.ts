@@ -49,8 +49,19 @@ export const SettingsRepository = {
 
   async importData(jsonString: string): Promise<boolean> {
     try {
+      if (!jsonString || typeof jsonString !== 'string') {
+        throw new Error('Empty or invalid JSON input');
+      }
       const data = JSON.parse(jsonString);
-      if (!data.version || !data.accounts) {
+
+      // Flexible validation: check for accounts, transactions, categories, or version
+      const hasValidData =
+        Array.isArray(data.accounts) ||
+        Array.isArray(data.transactions) ||
+        Array.isArray(data.categories) ||
+        Boolean(data.version);
+
+      if (!hasValidData) {
         throw new Error('Invalid MONETRA backup format');
       }
 
@@ -73,19 +84,19 @@ export const SettingsRepository = {
           db.audit_events,
         ],
         async () => {
-          if (data.accounts) await db.accounts.bulkPut(data.accounts);
-          if (data.transactions) await db.transactions.bulkPut(data.transactions);
-          if (data.categories) await db.categories.bulkPut(data.categories);
-          if (data.monthly_budgets) await db.monthly_budgets.bulkPut(data.monthly_budgets);
-          if (data.category_budgets) await db.category_budgets.bulkPut(data.category_budgets);
-          if (data.savings_goals) await db.savings_goals.bulkPut(data.savings_goals);
-          if (data.savings_contributions) await db.savings_contributions.bulkPut(data.savings_contributions);
-          if (data.recurring_bills) await db.recurring_bills.bulkPut(data.recurring_bills);
-          if (data.bill_instances) await db.bill_instances.bulkPut(data.bill_instances);
-          if (data.debts) await db.debts.bulkPut(data.debts);
-          if (data.debt_payments) await db.debt_payments.bulkPut(data.debt_payments);
-          if (data.salary_records) await db.salary_records.bulkPut(data.salary_records);
-          if (data.app_settings) await db.app_settings.bulkPut(data.app_settings);
+          if (Array.isArray(data.accounts) && data.accounts.length > 0) await db.accounts.bulkPut(data.accounts);
+          if (Array.isArray(data.transactions) && data.transactions.length > 0) await db.transactions.bulkPut(data.transactions);
+          if (Array.isArray(data.categories) && data.categories.length > 0) await db.categories.bulkPut(data.categories);
+          if (Array.isArray(data.monthly_budgets) && data.monthly_budgets.length > 0) await db.monthly_budgets.bulkPut(data.monthly_budgets);
+          if (Array.isArray(data.category_budgets) && data.category_budgets.length > 0) await db.category_budgets.bulkPut(data.category_budgets);
+          if (Array.isArray(data.savings_goals) && data.savings_goals.length > 0) await db.savings_goals.bulkPut(data.savings_goals);
+          if (Array.isArray(data.savings_contributions) && data.savings_contributions.length > 0) await db.savings_contributions.bulkPut(data.savings_contributions);
+          if (Array.isArray(data.recurring_bills) && data.recurring_bills.length > 0) await db.recurring_bills.bulkPut(data.recurring_bills);
+          if (Array.isArray(data.bill_instances) && data.bill_instances.length > 0) await db.bill_instances.bulkPut(data.bill_instances);
+          if (Array.isArray(data.debts) && data.debts.length > 0) await db.debts.bulkPut(data.debts);
+          if (Array.isArray(data.debt_payments) && data.debt_payments.length > 0) await db.debt_payments.bulkPut(data.debt_payments);
+          if (Array.isArray(data.salary_records) && data.salary_records.length > 0) await db.salary_records.bulkPut(data.salary_records);
+          if (Array.isArray(data.app_settings) && data.app_settings.length > 0) await db.app_settings.bulkPut(data.app_settings);
         }
       );
       return true;
