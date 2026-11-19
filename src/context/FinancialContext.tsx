@@ -29,7 +29,6 @@ import { AccountingEngine } from '../engine/accountingEngine';
 import { applyThemeToDocument } from '../engine/themes';
 import { LicenseService } from '../services/licenseService';
 import { ActivationGateModal } from '../components/licensing/ActivationGateModal';
-import { AdminPortalModal } from '../components/licensing/AdminPortalModal';
 
 interface FinancialContextType {
   // State
@@ -45,11 +44,8 @@ interface FinancialContextType {
   salaryRecords: SalaryRecord[];
   settings: AppSettings | null;
 
-  // Single-Device License & Admin Portal State
+  // Single-Device License State
   isLicensed: boolean;
-  isAdminPortalOpen: boolean;
-  openAdminPortal: () => void;
-  closeAdminPortal: () => void;
 
   // Navigation & Time scope
   currentMonth: string; // 'YYYY-MM'
@@ -118,13 +114,9 @@ export const FinancialProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   const [salaryRecords, setSalaryRecords] = useState<SalaryRecord[]>([]);
   const [settings, setSettings] = useState<AppSettings | null>(null);
 
-  // License & Admin Portal State
+  // License State
   const [isLicensed, setIsLicensed] = useState<boolean>(() => LicenseService.isAppLicensed());
   const [isActivationGateOpen, setIsActivationGateOpen] = useState<boolean>(() => !LicenseService.isAppLicensed());
-  const [isAdminPortalOpen, setIsAdminPortalOpen] = useState<boolean>(false);
-
-  const openAdminPortal = useCallback(() => setIsAdminPortalOpen(true), []);
-  const closeAdminPortal = useCallback(() => setIsAdminPortalOpen(false), []);
 
   // Month navigation & Persistent Account Selection
   const [currentMonth, setCurrentMonth] = useState<string>(() => {
@@ -463,9 +455,6 @@ export const FinancialProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         deleteSalaryRecord,
         updateSettings,
         isLicensed,
-        isAdminPortalOpen,
-        openAdminPortal,
-        closeAdminPortal,
       }}
     >
       {children}
@@ -477,15 +466,7 @@ export const FinancialProvider: React.FC<{ children: React.ReactNode }> = ({ chi
           setIsLicensed(true);
           setIsActivationGateOpen(false);
         }}
-        onOpenAdminPortal={() => {
-          setIsAdminPortalOpen(true);
-        }}
-      />
-
-      {/* Owner Admin License Portal Dashboard */}
-      <AdminPortalModal
-        isOpen={isAdminPortalOpen}
-        onClose={() => setIsAdminPortalOpen(false)}
+        onOpenAdminPortal={() => {}}
       />
     </FinancialContext.Provider>
   );

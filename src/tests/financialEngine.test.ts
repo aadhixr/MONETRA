@@ -7,7 +7,6 @@ import { AIInsightsService } from '../services/aiInsightsService';
 import { DEFAULT_EXPENSE_CATEGORIES } from '../db/seed';
 import { THEMES, normalizeThemeId, getThemeConfig } from '../engine/themes';
 import { LicenseService } from '../services/licenseService';
-import { LicenseAdminService } from '../services/licenseAdminService';
 import type { Account, Transaction, Category, CategoryBudget, MonthlyBudget } from '../types';
 
 function assert(condition: boolean, testName: string, detail?: string) {
@@ -1487,22 +1486,16 @@ async function runTestSuite() {
     `Income: ${formatPaise(realLedger.total_income_paise)}, Spent: ${formatPaise(realLedger.total_spent_paise)}, Closing: ${formatPaise(realLedger.closing_balance_paise)}`
   );
 
-  // TEST 34: Single-Device 12-Character Licensing Engine & SHA-256 Admin Authentication Verification
+  // TEST 34: Single-Device 12-Character Licensing Engine & Device Fingerprinting Verification
   const formattedKeyTest = LicenseService.formatKeyInput('a7b9k3x2m8q1');
-  const randomKey = LicenseAdminService.generateRandom12CharKey();
-  const passAuthValid = await LicenseAdminService.verifyAdminPassword('00100');
-  const passAuthInvalid = await LicenseAdminService.verifyAdminPassword('wrong_password');
   const { deviceId, deviceName } = LicenseService.getDeviceFingerprint();
 
   assert(
     formattedKeyTest === 'A7B9-K3X2-M8Q1' &&
-    randomKey.length === 12 &&
-    passAuthValid === true &&
-    passAuthInvalid === false &&
     Boolean(deviceId) &&
     Boolean(deviceName),
-    'TEST 34: Single-Device 12-Character Licensing Engine & SHA-256 Admin Authentication Verified',
-    `Key Format: ${formattedKeyTest}, Random Key: ${randomKey}, Admin Pass Auth: ${passAuthValid}, Device: ${deviceName}`
+    'TEST 34: Single-Device 12-Character Licensing Engine & Device Fingerprinting Verified',
+    `Key Format: ${formattedKeyTest}, Device ID: ${deviceId}, Device Name: ${deviceName}`
   );
 
   console.log('\n====================================================');

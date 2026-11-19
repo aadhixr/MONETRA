@@ -8,7 +8,6 @@ import { HomeScreen } from './components/home/HomeScreen';
 import { BudgetScreen } from './components/budget/BudgetScreen';
 import { SavingsScreen } from './components/savings/SavingsScreen';
 import { InsightsScreen } from './components/insights/InsightsScreen';
-import { AdminTabScreen } from './components/licensing/AdminTabScreen';
 
 import { AddTransactionModal } from './components/transaction/AddTransactionModal';
 import { TransactionListModal } from './components/transaction/TransactionListModal';
@@ -184,8 +183,6 @@ const MainAppContent: React.FC = () => {
         {currentTab === 'savings' && <SavingsScreen />}
 
         {currentTab === 'insights' && <InsightsScreen />}
-
-        {currentTab === 'admin' && <AdminTabScreen />}
       </main>
 
       {/* Fixed Mobile Bottom Navigation Bar */}

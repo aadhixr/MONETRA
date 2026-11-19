@@ -16,7 +16,7 @@ interface SettingsModalProps {
 }
 
 export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose }) => {
-  const { settings, updateSettings, refreshData, openAdminPortal } = useFinancial();
+  const { settings, updateSettings, refreshData } = useFinancial();
 
   const [userName, setUserName] = useState(settings?.user_name || 'Alex');
   const [selectedCurrency, setSelectedCurrency] = useState(settings?.currency_code || 'INR');
@@ -135,7 +135,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
     e.target.value = '';
   };
 
-  const CURRENT_APP_VERSION = 'v1.1.7';
+  const CURRENT_APP_VERSION = 'v1.1.8';
   const CURRENT_BUILD_NUMBER = '117';
   const LAST_UPDATE_DATE = '19 Nov 2026';
 
@@ -438,7 +438,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
           </div>
 
           {/* Wireless Update Action Button */}
-          <div className="pt-1 space-y-2">
+          <div className="pt-1">
             <button
               type="button"
               onClick={handleCheckForUpdates}
@@ -448,21 +448,6 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
               <RefreshCw className={`w-3.5 h-3.5 ${isCheckingUpdate ? 'animate-spin' : ''}`} />
               <span>{isCheckingUpdate ? 'Checking GitHub Releases...' : 'Check Wireless Update'}</span>
             </button>
-
-            {/* Owner Admin License Key Portal Access (Visible only in Admin Mode) */}
-            {typeof localStorage !== 'undefined' && localStorage.getItem('aurix_admin_authenticated') === 'true' && (
-              <button
-                type="button"
-                onClick={() => {
-                  onClose();
-                  openAdminPortal();
-                }}
-                className="w-full py-2 px-3 rounded-xl bg-[#1C2019] hover:bg-[#23281F] border border-[#30352B] hover:border-[#E7FF32] text-xs font-bold text-[#A1A69A] hover:text-[#E7FF32] flex items-center justify-center space-x-2 transition-colors cursor-pointer"
-              >
-                <ShieldAlert className="w-3.5 h-3.5 text-[#E7FF32]" />
-                <span>Owner Admin License Portal</span>
-              </button>
-            )}
           </div>
 
           {/* Update Status Banner & Download Button */}

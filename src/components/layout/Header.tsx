@@ -13,7 +13,6 @@ import {
   Sparkles,
   Plus,
   RotateCcw,
-  ShieldAlert,
 } from 'lucide-react';
 import { useFinancial } from '../../context/FinancialContext';
 import {
@@ -106,14 +105,11 @@ export const Header: React.FC<HeaderProps> = ({
     'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
   ];
 
-  const isAdminMode = typeof localStorage !== 'undefined' && localStorage.getItem('aurix_admin_authenticated') === 'true';
-
   const navTabs = [
     { id: 'home' as TabType, label: 'Home', icon: Home },
     { id: 'budget' as TabType, label: 'Budget', icon: PieChart },
     { id: 'savings' as TabType, label: 'Savings', icon: PiggyBank },
     { id: 'insights' as TabType, label: 'Insights', icon: Sparkles },
-    ...(isAdminMode ? [{ id: 'admin' as TabType, label: 'Admin 👑', icon: ShieldAlert }] : []),
   ];
 
   return (
