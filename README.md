@@ -1,140 +1,188 @@
-# AURIX — Institutional Personal Wealth & Money Management
+# 🚀 AURIX PRO — Institutional Personal Wealth & Money Management
 
-> **"Precision in every paisa, beauty in every pixel."**
+<div align="center">
 
-AURIX is a commercial-grade, mobile-first personal wealth and finance application engineered strictly for luxury dark fintech aesthetics with 8 switchable color themes (defaulting to **Monochrome State** with brushed titanium and champagne gold accents).
+![AURIX PRO Logo](public/logo.jpg)
 
-It operates with institutional double-entry financial rigor—eliminating IEEE 754 floating-point inaccuracies through an integer-paise mathematical calculation engine.
+**"Precision in every paisa, beauty in every pixel."**
 
----
+[![Version](https://img.shields.io/badge/version-v1.1.9-E7FF32?style=for-the-badge&logo=android&logoColor=black)](https://github.com/aadhixr/MONETRA/releases)
+[![Build Status](https://img.shields.io/github/actions/workflow/status/aadhixr/MONETRA/release.yml?branch=main&style=for-the-badge&logo=github)](https://github.com/aadhixr/MONETRA/actions)
+[![Platform](https://img.shields.io/badge/platform-Android%20%7C%20iOS%20%7C%20Web-30352B?style=for-the-badge&logo=capacitor)](https://github.com/aadhixr/MONETRA)
+[![License](https://img.shields.io/badge/license-MIT-D4AF37?style=for-the-badge)](LICENSE)
 
-## 🌟 Key Architectural Features
-
-### 1. Four Mobile-First Core Views (Matching Reference Layout)
-1. **HOME**: Main balance hero card (show/hide toggle), Quick Actions (+Expense, +Income, Transfer, Salary), Monthly Overview (Income, Expenses, Net Savings, Budget Remaining), Spending progress bar, Upcoming recurring bills, Savings goals preview, and Recent Transactions with receipt attachment inspection.
-2. **BUDGET**: Real-time monthly budget cap, spent vs remaining stats, thin progress bar, and category-wise allocations with automated 75% (Warning), 90% (Critical Alert), and 100% (Exceeded) triggers. Supports 1-click previous month budget copying.
-3. **SAVINGS**: Total accumulated savings hero, active savings goals (Emergency Fund, Smartphone, Laptop, Vehicle, Vacation, Custom), percentage progress, target dates, and strictly recorded inter-account contributions and withdrawals. Triggers celebratory confetti upon reaching 100%!
-4. **INSIGHTS**: Recharts-powered category breakdown and daily spending velocity charts, AI-driven anomaly detection, daily safe-to-spend computation, and an interactive on-device AI Financial Assistant that answers queries in real time.
-
-### 2. High-Velocity Add Transaction System
-- Globally accessible floating Neon Lime Add (+) action button.
-- Comprehensive bottom sheet modal with numeric keypad and quick amount pills (+100, +500, +1000, +2000, +5000).
-- Support for **EXPENSE**, **INCOME**, and **TRANSFER**.
-- 19 Expense Categories & 8 Income Categories with custom icons and colors.
-- Image receipt capture and base64 storage.
-- Immediate, atomic balance and chart recalculation upon confirmation.
-
-### 3. Institutional Accounting Engine
-- Pure integer **paise** math ($1\text{ INR} = 100\text{ paise}$).
-- Inter-account transfers and savings allocations are mathematically neutral—preventing artificial inflation of monthly income or expenses.
-- Carry-forward balance across monthly accounting periods without resetting to zero.
-- Historical immutability: Transactions in future months never corrupt prior historical monthly summaries.
-
-### 4. Secondary Features Hub
-- **Salary Center**: Track expected vs received salary; expected earnings never falsely inflate live balance until marked as credited.
-- **Multiple Accounts**: Manage Cash Wallets, Bank Accounts, UPI/Digital Wallets, and Savings Reserves with live balance calculation.
-- **Recurring Bills**: Manage rent, subscriptions, recharges, and utility bills with 1-click payment posting.
-- **Debt Manager**: Track money lent to friends or borrowed from institutions with partial or full repayment settlements.
-- **Financial Calendar**: Interactive monthly calendar with day-by-day cashflow pins and transaction logs.
-- **Export Engine**: Export official PDF financial statements with neon lime formatting, or download clean CSV transaction records.
-- **Optional Cloud Vault**: 100% local-first and offline by default. Optionally syncs encrypted payloads (AES-GCM client-side encryption) to your personal Supabase instance.
+</div>
 
 ---
 
-## 🚀 Getting Started
+## 🏛️ Executive Summary
 
-### Prerequisites
-- Node.js >= 18
-- npm >= 9
+**AURIX PRO** is a commercial-grade, privacy-first personal wealth and finance management system engineered for luxury dark fintech aesthetics. Built with modern web and native mobile technologies, AURIX PRO operates with double-entry financial rigor—eliminating floating-point inaccuracies through an exact 2-decimal calculation engine.
 
-### Installation
-```bash
-cd monetra
-npm install
-```
-
-### Running the App Locally
-```bash
-npm run dev
-```
-Open your browser at `http://localhost:3000`.
-
-### Running the Production Build
-```bash
-npm run build
-```
+100% of user data is stored locally on-device inside IndexedDB. AURIX PRO includes optional end-to-end encrypted cloud vault synchronization via Supabase (`AES-GCM 256-bit`).
 
 ---
 
-## 🧪 Automated Financial Test Suite
+## 🌟 Full Feature Set & Capability Matrix
 
-MONETRA includes an automated test runner that validates all 14 test cases specified in Section 25:
+### 🧮 1. Precision Financial Engine & Double-Entry Ledger
+- **Strict Two-Decimal Standard**: Computes exact balance reconciliation formatted as `₹0.00`, preventing floating-point calculation drift.
+- **Liquid Spending vs Protected Savings**: Automatically segregates spendable bank/cash liquid balances from protected savings reserves.
+- **Neutral Inter-Account Transfers**: Transfers between Bank, Cash, and Savings Reserves are neutral—preventing artificial inflation of monthly income or expenditures.
+- **Insufficient Balance Protection**: Real-time validation flags transactions or transfers that exceed available liquid funds before execution.
+- **Self-Healing Reconciliation**: Historical transactions automatically adjust total net worth and closing balances without corrupting historical periods.
+
+### 🤖 2. AI Financial Insights & Query Engine
+- **Natural Language Assistant**: Answers real-time financial queries:
+  - *"How much did I spend this month?"* -> Returns exact aggregated expenditures.
+  - *"What was debited?"* -> Filters and displays verified debit entries.
+  - *"Can I afford ₹15,000?"* -> Computes real-time affordability against available liquid balance.
+- **Smart Category Engine**: Auto-identifies expenditure categories from merchant names and keywords (e.g. *Biryani / Dosa* -> Food; *Jio / Airtel* -> Mobile Recharge; *Rent* -> Housing).
+
+### 💼 3. Multi-Account & Savings Architecture
+- **Account Types**: Primary Bank Accounts, Cash Wallets, and Savings Reserves.
+- **Savings Vault Protection**: Savings funds are strictly excluded from spendable totals.
+- **Auto-Reconciling Transfer Modal**: Selecting a source account automatically selects a distinct destination account.
+
+### 📊 4. Smart Budget Engine & Threshold Alerts
+- **Dynamic Threshold Monitors**: Triggers 3 visual alert statuses based on consumption:
+  - 🟡 **Warning** (83.3% consumed)
+  - 🟠 **Strong Warning** (92% consumed)
+  - 🔴 **Exceeded** (105% consumed)
+- **Salary Auto-Budgeting**: Credited salary automatically sets the monthly base budget with usage percentage calculations.
+
+### 🗓️ 5. Financial Calendar & Multi-Month Isolation
+- **Timezone Drift Protection**: Navigates between months and years (`2026-01` -> `2025-12` or `2026-12` -> `2027-01`) without date shifting.
+- **Historical Ledger Isolation**: Historical monthly closing balances remain immutable against earnings in future months.
+
+### 🎨 6. 8 Luxury Themes
+Defaulting to **Monochrome Obsidian**, AURIX PRO features 8 switchable luxury themes:
+1. 🖤 **Monochrome Obsidian**
+2. 🪙 **Classic Gold**
+3. 🟩 **Neon Mint**
+4. 🟣 **Cyberpunk**
+5. 🌹 **Velvet Rose**
+6. 💙 **Royal Sapphire**
+7. 💎 **Emerald Luxury**
+8. ⚙️ **Titanium Steel**
+
+### 🔐 7. Encrypted Cloud Sync & Data Security
+- **AES-GCM 256-bit Client Encryption**: Vault data is encrypted with client passphrase before leaving the device.
+- **Supabase Cloud Vault**: Secure cloud backup to user's personal Supabase database table (`monetra_backups`).
+- **Connection Diagnostics**: Built-in test button verifies Supabase URL, Anon Key, and Row Level Security (RLS) status.
+- **Local JSON Export & Import**: One-click offline backup and restore.
+
+### 📱 8. Native Android & iOS Integration
+- **3D Metallic AX Monogram**: High-resolution launcher icon padded cleanly across all Android density folders (`mdpi` to `xxxhdpi`) and iOS AppIcon set.
+- **Native Android Back Button Stack**:
+  - Closes active modals in priority order.
+  - Navigates back through tab history (Insights/Savings/Budget -> Home).
+  - Minimizes app cleanly from root Home screen.
+- **Native Xcode iOS Support**: Pre-configured Capacitor iOS project (`ios/App/App.xcodeproj`).
+- **Wireless Updates (OTA)**: Integrated update checker checks GitHub Releases API for 1-click APK installation.
+
+---
+
+## 🧪 Automated Financial Validation Test Suite (33/33 Passed)
+
+AURIX PRO includes an automated test runner validating all 33 financial logic test cases:
 
 ```bash
 npm test
 ```
 
-### Test Suite Coverage:
-1. `TEST 1`: Cash account creation with ₹10,000 -> verified ₹10,000 balance.
-2. `TEST 2`: Crediting salary of ₹35,000 -> verified ₹45,000 balance.
-3. `TEST 3`: Logging food expense of ₹250 -> verified ₹44,750 balance.
-4. `TEST 4`: Transferring ₹5,000 to savings -> verified Cash ₹39,750, Savings ₹5,000, Combined ₹44,750, and zero monthly income/expense leakage.
-5. `TEST 5`: Expense modification to ₹400 -> verified ₹39,600 updated balance.
-6. `TEST 6`: Expense deletion -> verified exact balance restoration.
-7. `TEST 7`: Cross-month immutability check (November vs December).
-8. `TEST 8`: Category budget compliance & multi-tier alerts (75%, 90%, 100%).
-9. `TEST 9`: Linked savings goal contributions without double counting.
-10. `TEST 10`: Full state serialization & reconstruction without bit loss.
-11. `TEST 11`: 100% offline functionality.
-12. `TEST 12`: AES-GCM client-side encryption & restore integrity.
-13. `TEST 13`: Collision & duplicate transaction prevention.
-14. `TEST 14`: AI natural language answering grounded in real ledger figures.
+### ✅ Summary of Validated Tests:
+- `TEST 1`: Cash account creation with ₹10,000 -> verified ₹10,000.
+- `TEST 2`: Salary addition of ₹35,000 -> verified ₹45,000.
+- `TEST 3`: Food expense of ₹250 -> verified ₹44,750.
+- `TEST 4A-4E`: Inter-account transfer to savings (₹5,000) -> verified liquid spending ₹39,750, savings ₹5,000, neutral income/expense.
+- `TEST 5-6`: Expense edit & deletion balance restoration.
+- `TEST 7`: Cross-month ledger immutability (Nov vs Dec).
+- `TEST 8A-8C`: Multi-tier budget alerts (83.3%, 92%, 105%).
+- `TEST 9-13`: Savings contribution isolation, loss-free serialization, 100% offline calculations, AES-GCM restore, zero duplicate collision.
+- `TEST 14A-14D`: AI natural language answering grounded in verified ledger figures.
+- `TEST 15-20`: Backdated salary calculations, timezone navigation, insufficient balance protection.
+- `TEST 21-25`: Merchant category identification, food & recharge keywords, lending money audit matrix, monthly budget auto-setting.
+- `TEST 26-30`: Two-decimal currency formatting (`₹0.00`), self-healing balance reconciliation, spendable isolation, multi-theme engine, budget tab reconciliation.
+- `TEST 31-33`: Account auto-selection, backup file restoration, physical device ADB extraction validation.
 
 ---
 
-## 📱 Android Packaging with Capacitor
+## 🛠️ Getting Started & Local Development
 
-MONETRA V3 is pre-configured with Capacitor for Android native deployment:
+### Prerequisites
+- **Node.js** >= 18.0
+- **npm** >= 9.0
+- **Android Studio** (for Android APK builds)
+- **Xcode** (for macOS iOS builds)
 
+### Installation
 ```bash
-# 1. Build the production web assets
+git clone https://github.com/aadhixr/MONETRA.git
+cd monetra
+npm install
+```
+
+### Start Development Server
+```bash
+npm run dev
+```
+Open browser at `http://localhost:3000`.
+
+### Run Test Suite
+```bash
+npm test
+```
+
+### Production Build
+```bash
 npm run build
-
-# 2. Add Android platform (if not already added)
-npx cap add android
-
-# 3. Synchronize web assets into Android project
-npx cap sync
-
-# 4. Open in Android Studio to build APK or run on connected device / emulator
-npx cap open android
 ```
 
-Alternatively, to run directly on a connected device via CLI:
+---
+
+## 📱 Mobile Platform Builds
+
+### Android Native Build
 ```bash
-npx cap run android
+# 1. Sync web dist into Android project
+npx cap sync android
+
+# 2. Compile release APK using Gradle
+cd android
+./gradlew assembleRelease
 ```
+The compiled signed APK will be output to:
+`android/app/build/outputs/apk/release/app-release.apk`
+
+### iOS Native Build (macOS)
+```bash
+# 1. Sync web dist into iOS project
+npx cap sync ios
+
+# 2. Open project in Xcode
+npx cap open ios
+```
+In Xcode, select target device and press **Run (⌘R)**.
 
 ---
 
-## 🎨 Color Tokens & Design System
+## 💻 Developer & Credits
 
-| Role | Hex | Purpose |
-|---|---|---|
-| Primary Background | `#090B08` | Deep obsidian surface |
-| Secondary Background | `#151812` | Dark forest charcoal container |
-| Card Background | `#1C2019` | Elevated financial cards |
-| Card Elevated / Modal | `#23281F` | Dialogs & active cards |
-| Primary Accent | `#E7FF32` | Neon lime brand & balance figures |
-| Secondary Accent | `#C9E927` | Subtle lime secondary indicators |
-| Border | `#30352B` | Minimalist financial dividers |
-| Success | `#A8E66A` | Savings achieved & income credits |
-| Danger / Expense | `#FF6868` | Expenses & budget overruns |
-| Warning | `#FFD166` | 90% budget warning alerts |
+<div align="center">
+
+### **Lead Architect & Developer**
+### **Aadhi**
+[@aadhixr](https://github.com/aadhixr)
+
+**Repository**: [https://github.com/aadhixr/MONETRA](https://github.com/aadhixr/MONETRA)  
+**Package ID**: `io.aurix.app`
 
 ---
 
-## 🔒 Security & Privacy
-- **Local-First**: Data never leaves your device unless you explicitly configure your personal Supabase credentials.
-- **Client-Side Encryption**: Vault backups are encrypted with `AES-GCM (256-bit)` using `PBKDF2` key derivation with 100,000 iterations.
-- **Zero Third-Party Trackers**: No analytics beacons, cookies, or hidden telemetry.
+### 📄 License
+This project is licensed under the **MIT License** — see the [LICENSE](LICENSE) file for details.
+
+*Copyright © 2026 Aadhi. All rights reserved.*
+
+</div>
