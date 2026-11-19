@@ -1,6 +1,6 @@
 // MONETRA V3 - Settings, Privacy & Cloud Vault Management
 import React, { useState } from 'react';
-import { Settings, User, Cloud, Database, Download, Upload, Shield, Trash2, CheckCircle2, Palette, Check } from 'lucide-react';
+import { Settings, User, Cloud, Database, Download, Upload, Shield, Trash2, CheckCircle2, Palette, Check, Smartphone, RefreshCw, ExternalLink, Info } from 'lucide-react';
 import { Modal } from '../common/Modal';
 import { Button } from '../common/Button';
 import { useFinancial } from '../../context/FinancialContext';
@@ -15,7 +15,7 @@ interface SettingsModalProps {
   onReplaySplash?: () => void;
 }
 
-export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose, onReplaySplash }) => {
+export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose }) => {
   const { settings, updateSettings, refreshData } = useFinancial();
 
   const [userName, setUserName] = useState(settings?.user_name || 'Alex');
@@ -25,6 +25,16 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose, o
 
   const [syncStatusMsg, setSyncStatusMsg] = useState<string | null>(null);
   const [isSyncing, setIsSyncing] = useState(false);
+
+  // Wireless OTA Update State
+  const [isCheckingUpdate, setIsCheckingUpdate] = useState(false);
+  const [updateStatus, setUpdateStatus] = useState<{
+    checked: boolean;
+    hasUpdate: boolean;
+    latestTag?: string;
+    downloadUrl?: string;
+    message?: string;
+  }>({ checked: false, hasUpdate: false });
 
   const currentThemeId = normalizeThemeId(settings?.theme);
 
@@ -128,6 +138,49 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose, o
     e.target.value = '';
   };
 
+  const CURRENT_APP_VERSION = 'v1.0.5';
+  const CURRENT_BUILD_NUMBER = '105';
+  const LAST_UPDATE_DATE = '19 Nov 2026';
+
+  const handleCheckForUpdates = async () => {
+    setIsCheckingUpdate(true);
+    try {
+      const res = await fetch('https://api.github.com/repos/aadhixr/MONETRA/releases/latest');
+      if (!res.ok) {
+        throw new Error('Could not connect to GitHub Release API');
+      }
+      const data = await res.json();
+      const latestTag = data.tag_name || 'v1.0.5';
+      const apkAsset = data.assets?.find((a: any) => a.name.endsWith('.apk'));
+      const downloadUrl = apkAsset?.browser_download_url || data.html_url;
+
+      if (latestTag !== CURRENT_APP_VERSION && latestTag > CURRENT_APP_VERSION) {
+        setUpdateStatus({
+          checked: true,
+          hasUpdate: true,
+          latestTag,
+          downloadUrl,
+          message: `New Wireless Update Available (${latestTag})!`,
+        });
+      } else {
+        setUpdateStatus({
+          checked: true,
+          hasUpdate: false,
+          latestTag,
+          message: `You are running the latest version of MONETRA V3 (${CURRENT_APP_VERSION}).`,
+        });
+      }
+    } catch (err: any) {
+      setUpdateStatus({
+        checked: true,
+        hasUpdate: false,
+        message: `Update check failed: ${err.message}`,
+      });
+    } finally {
+      setIsCheckingUpdate(false);
+    }
+  };
+
   const handleFactoryReset = async () => {
     if (confirm('CRITICAL: This will erase all local transactions and reset database. Have you exported your data? Proceed?')) {
       await SettingsRepository.resetEntireDatabase();
@@ -160,19 +213,6 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose, o
               </div>
               <p className="text-xs text-[#A1A69A] mt-0.5">Privacy-First Dark Fintech & Ledger</p>
               <div className="text-[10px] text-[#A8E66A] font-mono mt-0.5">100% On-Device • Zero Telemetry</div>
-              {onReplaySplash && (
-                <button
-                  type="button"
-                  onClick={() => {
-                    onClose();
-                    onReplaySplash();
-                  }}
-                  className="mt-2 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#151812] hover:bg-[#23281F] border border-[#30352B] hover:border-[#E7FF32] text-[11px] font-semibold text-[#E7FF32] transition-colors cursor-pointer"
-                  title="Watch cinematic app opening animation"
-                >
-                  <span>▶ Replay Opening Animation</span>
-                </button>
-              )}
             </div>
           </div>
           <div className="hidden sm:flex items-center gap-2">
@@ -406,6 +446,78 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose, o
           <Button variant="danger" size="sm" fullWidth onClick={handleFactoryReset}>
             Reset All Data
           </Button>
+        </div>
+
+        {/* App Version Info & Wireless OTA Update Check */}
+        <div className="p-4 bg-[#151812] border border-[#30352B] rounded-2xl space-y-3">
+          <div className="flex items-center justify-between pb-2 border-b border-[#30352B]">
+            <div className="flex items-center space-x-2">
+              <Smartphone className="w-4 h-4 text-[#E7FF32]" />
+              <span className="text-xs font-bold text-white uppercase tracking-wider">
+                Application Info & Wireless Updates
+              </span>
+            </div>
+            <span className="text-[10px] font-mono text-[#A8E66A] bg-[#A8E66A]/10 border border-[#A8E66A]/30 px-2 py-0.5 rounded-full">
+              OTA Ready
+            </span>
+          </div>
+
+          <div className="grid grid-cols-3 gap-2 text-center py-1">
+            <div className="p-2 bg-[#1C2019] border border-[#30352B] rounded-xl">
+              <span className="block text-[10px] text-[#A1A69A] uppercase tracking-wider">App Name</span>
+              <span className="text-xs font-bold text-white">MONETRA V3</span>
+            </div>
+            <div className="p-2 bg-[#1C2019] border border-[#30352B] rounded-xl">
+              <span className="block text-[10px] text-[#A1A69A] uppercase tracking-wider">Version</span>
+              <span className="text-xs font-bold text-[#E7FF32] font-mono">{CURRENT_APP_VERSION}</span>
+            </div>
+            <div className="p-2 bg-[#1C2019] border border-[#30352B] rounded-xl">
+              <span className="block text-[10px] text-[#A1A69A] uppercase tracking-wider">Last Updated</span>
+              <span className="text-xs font-bold text-white">{LAST_UPDATE_DATE}</span>
+            </div>
+          </div>
+
+          {/* Wireless Update Action Button */}
+          <div className="pt-1">
+            <button
+              type="button"
+              onClick={handleCheckForUpdates}
+              disabled={isCheckingUpdate}
+              className="w-full py-2.5 px-4 rounded-xl bg-[#1C2019] hover:bg-[#23281F] border border-[#30352B] hover:border-[#E7FF32]/60 text-xs font-bold text-[#E7FF32] flex items-center justify-center space-x-2 transition-all cursor-pointer disabled:opacity-50"
+            >
+              <RefreshCw className={`w-3.5 h-3.5 ${isCheckingUpdate ? 'animate-spin' : ''}`} />
+              <span>{isCheckingUpdate ? 'Checking GitHub Releases...' : 'Check Wireless Update'}</span>
+            </button>
+          </div>
+
+          {/* Update Status Banner & Download Button */}
+          {updateStatus.checked && (
+            <div
+              className={`p-3 rounded-xl border text-xs ${
+                updateStatus.hasUpdate
+                  ? 'bg-[#E7FF32]/10 border-[#E7FF32]/50 text-white'
+                  : 'bg-[#1C2019] border-[#30352B] text-[#A1A69A]'
+              }`}
+            >
+              <div className="flex items-center space-x-2 mb-1">
+                <Info className="w-4 h-4 text-[#E7FF32] shrink-0" />
+                <span className="font-semibold text-white">{updateStatus.message}</span>
+              </div>
+
+              {updateStatus.hasUpdate && updateStatus.downloadUrl && (
+                <a
+                  href={updateStatus.downloadUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="mt-2.5 inline-flex items-center justify-center space-x-1.5 w-full py-2 px-3 rounded-lg bg-[#E7FF32] text-[#090B08] font-bold text-xs hover:bg-[#C9E927] transition-all shadow-[0_0_12px_rgba(231,255,50,0.3)]"
+                >
+                  <Download className="w-4 h-4" />
+                  <span>Download Latest Release APK ({updateStatus.latestTag})</span>
+                  <ExternalLink className="w-3.5 h-3.5 ml-1" />
+                </a>
+              )}
+            </div>
+          )}
         </div>
 
         {syncStatusMsg && (
